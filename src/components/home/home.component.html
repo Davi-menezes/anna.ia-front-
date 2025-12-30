@@ -1,0 +1,176 @@
+
+<div class="overflow-x-hidden">
+  <!-- Section 1: Hero / AI Chat -->
+  <section id="chat" class="min-h-screen flex flex-col items-center justify-center pt-24 pb-12 px-4">
+    <div class="w-full max-w-3xl text-center">
+      <h1 class="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-futuristic-primary to-futuristic-secondary pb-2">
+        Bem-vindo à sua assistente de estudos, Anna!
+      </h1>
+      <div class="mt-2 h-1 w-32 mx-auto bg-gradient-to-r from-futuristic-primary to-futuristic-secondary rounded-full animate-glow"></div>
+
+      <div class="mt-12 w-full h-[50vh] flex flex-col bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 dark:border-slate-700/50">
+        <div class="flex-1 p-6 overflow-y-auto space-y-4">
+          @for (message of messages(); track $index) {
+            <div class="flex" [class.justify-end]="message.role === 'user'" [class.justify-start]="message.role === 'model'">
+              <div 
+                class="max-w-md py-2 px-4 rounded-2xl"
+                [class.bg-futuristic-primary]="message.role === 'user'"
+                [class.text-white]="message.role === 'user'"
+                [class.bg-white]="message.role === 'model'"
+                [class.dark:bg-slate-700]="message.role === 'model'"
+                [class.shadow-md]="message.role === 'model'"
+              >
+                <p class="text-sm md:text-base whitespace-pre-wrap">{{ message.content }}</p>
+              </div>
+            </div>
+          }
+          @if (geminiService.loading()) {
+            <div class="flex justify-start">
+               <div class="max-w-md py-2 px-4 rounded-2xl bg-white dark:bg-slate-700 shadow-md">
+                <div class="flex items-center space-x-2">
+                  <div class="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                  <div class="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:0.2s]"></div>
+                  <div class="w-2 h-2 bg-gray-400 rounded-full animate-pulse [animation-delay:0.4s]"></div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="p-4 border-t border-gray-200/50 dark:border-slate-700/50">
+          <form (submit)="sendMessage()" class="flex items-center space-x-2">
+            <input 
+              [(ngModel)]="userInput" 
+              name="userInput"
+              type="text" 
+              placeholder="Digite sua pergunta ou dúvida..."
+              class="flex-1 w-full px-4 py-3 bg-white/80 dark:bg-slate-700 text-futuristic-text dark:text-dark-text placeholder-futuristic-subtext dark:placeholder-dark-subtext rounded-full focus:outline-none focus:ring-2 focus:ring-futuristic-primary transition-all duration-300 disabled:opacity-50"
+              [disabled]="geminiService.loading() || userService.credits() <= 0">
+            <button 
+              type="submit"
+              class="w-12 h-12 flex items-center justify-center bg-futuristic-primary text-white rounded-full hover:bg-futuristic-secondary transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="geminiService.loading() || !userInput().trim() || userService.credits() <= 0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Simulados Interativos -->
+  <section id="simulados" class="py-20 px-4">
+    <div class="container mx-auto max-w-5xl text-center">
+      <h2 class="text-3xl md:text-5xl font-bold text-futuristic-text dark:text-dark-text">Simulados Inteligentes</h2>
+      <p class="mt-4 text-lg text-futuristic-subtext dark:text-dark-subtext">Teste seus conhecimentos com questões geradas por IA.</p>
+      
+      <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+        @for (simulado of simulados(); track simulado.id) {
+          <div 
+            class="p-6 text-left bg-white/60 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 dark:border-slate-700/50 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+            [class.cursor-not-allowed]="userService.credits() <= 0"
+            [class.opacity-60]="userService.credits() <= 0"
+            (click)="selectSimulado(simulado)">
+            <h3 class="text-2xl font-semibold text-futuristic-primary">{{ simulado.subject }}</h3>
+            @if (selectedSimulado() === simulado) {
+              <div class="mt-6 space-y-4">
+                <p class="text-futuristic-text dark:text-dark-text font-medium">{{ simulado.question }}</p>
+                <div class="space-y-3">
+                  @for (option of simulado.options; track $index) {
+                    <button 
+                      class="w-full text-left p-3 rounded-lg border transition-colors duration-200 text-futuristic-text dark:text-dark-text"
+                      [class.border-gray-300]="selectedAnswer() === null"
+                      [class.dark:border-slate-600]="selectedAnswer() === null"
+                      [class.hover:bg-blue-100]="selectedAnswer() === null"
+                      [class.dark:hover:bg-slate-700]="selectedAnswer() === null"
+                      [class.cursor-default]="selectedAnswer() !== null"
+                      [class.border-green-500]="selectedAnswer() !== null && $index === simulado.correctAnswerIndex"
+                      [class.dark:border-green-500]="selectedAnswer() !== null && $index === simulado.correctAnswerIndex"
+                      [class.bg-green-100]="selectedAnswer() !== null && $index === simulado.correctAnswerIndex"
+                      [class.dark:bg-green-500/20]="selectedAnswer() !== null && $index === simulado.correctAnswerIndex"
+                      [class.text-green-800]="selectedAnswer() !== null && $index === simulado.correctAnswerIndex"
+                      [class.dark:text-green-300]="selectedAnswer() !== null && $index === simulado.correctAnswerIndex"
+                      [class.border-red-500]="selectedAnswer() === $index && $index !== simulado.correctAnswerIndex"
+                      [class.dark:border-red-500]="selectedAnswer() === $index && $index !== simulado.correctAnswerIndex"
+                      [class.bg-red-100]="selectedAnswer() === $index && $index !== simulado.correctAnswerIndex"
+                      [class.dark:bg-red-500/20]="selectedAnswer() === $index && $index !== simulado.correctAnswerIndex"
+                      [class.text-red-800]="selectedAnswer() === $index && $index !== simulado.correctAnswerIndex"
+                      [class.dark:text-red-300]="selectedAnswer() === $index && $index !== simulado.correctAnswerIndex"
+                      (click)="submitAnswer($index)"
+                      [disabled]="selectedAnswer() !== null">
+                      {{ option }}
+                    </button>
+                  }
+                </div>
+                @if (selectedAnswer() !== null) {
+                  <div class="mt-4 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg border border-indigo-200 dark:border-indigo-500/30">
+                    <h4 class="font-bold text-indigo-800 dark:text-indigo-300">Explicação:</h4>
+                    <p class="mt-1 text-indigo-700 dark:text-indigo-400">{{ simulado.explanation }}</p>
+                  </div>
+                }
+              </div>
+            } @else {
+               <p class="mt-2 text-futuristic-subtext dark:text-dark-subtext">Clique para iniciar um quiz rápido sobre {{ simulado.subject.toLowerCase() }}.</p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Guia de Vestibulares Preview -->
+  <section id="vestibulares-preview" class="py-20 px-4 bg-white/50 dark:bg-slate-800/20">
+    <div class="container mx-auto max-w-5xl text-center">
+      <h2 class="text-3xl md:text-5xl font-bold text-futuristic-text dark:text-dark-text">Guia de Vestibulares</h2>
+      <p class="mt-4 text-lg text-futuristic-subtext dark:text-dark-subtext">Fique por dentro das datas e informações dos principais exames.</p>
+
+      <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+        @for (vestibular of vestibularesPreview(); track vestibular.acronym) {
+          <div class="flex flex-col p-8 bg-white/60 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 dark:border-slate-700/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+            <div class="flex-grow">
+              <h2 class="text-2xl font-bold text-futuristic-primary">{{ vestibular.acronym }}</h2>
+              <h3 class="text-md font-medium text-futuristic-text dark:text-dark-text -mt-1">{{ vestibular.name }}</h3>
+              <p class="mt-4 text-sm text-futuristic-subtext dark:text-dark-subtext">{{ vestibular.description }}</p>
+              <div class="mt-6 pt-4 border-t border-gray-200 dark:border-slate-700 space-y-3 text-sm">
+                <div>
+                  <p class="font-semibold text-futuristic-text dark:text-dark-text">Período de Inscrição:</p>
+                  <p class="text-futuristic-subtext dark:text-dark-subtext">{{ vestibular.registrationPeriod }}</p>
+                </div>
+                <div>
+                  <p class="font-semibold text-futuristic-text dark:text-dark-text">Datas das Provas:</p>
+                  <ul class="list-disc list-inside ml-1">
+                    @for(date of vestibular.examDates; track date) {
+                      <li class="text-futuristic-subtext dark:text-dark-subtext">{{ date }}</li>
+                    }
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <a [href]="vestibular.officialSiteUrl" target="_blank" rel="noopener noreferrer" class="mt-8 w-full block text-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-futuristic-primary hover:bg-futuristic-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+              Ver Site Oficial
+            </a>
+          </div>
+        }
+      </div>
+
+      <div class="mt-12">
+        <a routerLink="/vestibulares" class="inline-block py-3 px-8 border border-transparent text-lg font-medium rounded-full text-white bg-futuristic-primary hover:bg-futuristic-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+          Ver todos os guias
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Mission & Purpose -->
+  <section id="mission" class="py-20 px-4">
+     <div class="container mx-auto max-w-3xl text-center">
+        <h2 class="text-3xl md:text-5xl font-bold text-futuristic-text dark:text-dark-text">Por que a Anna existe?</h2>
+        <div class="mt-10 text-lg text-futuristic-subtext dark:text-dark-subtext space-y-6 text-left md:text-center">
+            <p>Acreditamos que a tecnologia pode ser uma poderosa aliada na educação. A Anna.IA nasceu com a missão de democratizar o acesso ao conhecimento de qualidade para todos os estudantes do Brasil.</p>
+            <p>Utilizamos inteligência artificial de ponta para criar uma experiência de aprendizado personalizada, acessível e eficiente, ajudando você a superar desafios, tirar dúvidas e alcançar seu máximo potencial.</p>
+            <p>Nosso objetivo é ser mais do que uma ferramenta; queremos ser sua parceira de estudos, apoiando sua jornada educacional a cada passo.</p>
+        </div>
+     </div>
+  </section>
+
+</div>
+<app-credits-modal></app-credits-modal>

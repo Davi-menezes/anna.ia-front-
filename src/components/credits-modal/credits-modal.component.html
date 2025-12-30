@@ -1,0 +1,32 @@
+
+@if (userService.isOutOfCreditsModalOpen()) {
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="closeModal()">
+    <div class="w-full max-w-md p-8 space-y-6 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-white/40 dark:border-slate-700 transform transition-all" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      
+      <div class="flex justify-between items-start">
+        <div class="text-left">
+          <h3 class="text-2xl font-bold text-futuristic-text dark:text-dark-text">Seus Créditos Acabaram</h3>
+          <p class="mt-2 text-futuristic-subtext dark:text-dark-subtext">Para continuar usando a Anna.IA, você precisa de mais créditos.</p>
+        </div>
+        <button (click)="closeModal()" class="p-2 -mt-2 -mr-2 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700">
+          <svg class="w-6 h-6 text-futuristic-subtext dark:text-dark-subtext" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="text-center p-4 bg-indigo-50 dark:bg-slate-700 rounded-lg">
+        <p class="text-sm text-futuristic-subtext dark:text-dark-subtext">Créditos restantes:</p>
+        <p class="text-4xl font-bold text-futuristic-primary">0</p>
+      </div>
+      <div class="flex flex-col gap-4">
+        <button (click)="goToCreditsPage()"
+          class="w-full py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-futuristic-primary hover:bg-futuristic-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+          Comprar mais créditos
+        </button>
+         <button (click)="closeModal()"
+          class="w-full py-2 px-4 border border-gray-300 dark:border-slate-600 text-sm font-medium rounded-md text-futuristic-text dark:text-dark-text bg-white dark:bg-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,38 @@
+
+<div class="min-h-screen flex items-center justify-center pt-20 px-4">
+  <div class="w-full max-w-md p-8 space-y-8 bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-2xl border border-white/40 dark:border-slate-700/50">
+    <div class="text-center">
+      <h2 class="text-3xl font-bold text-futuristic-text dark:text-dark-text">Acessar sua Conta</h2>
+      <p class="mt-2 text-futuristic-subtext dark:text-dark-subtext">Bem-vindo de volta!</p>
+    </div>
+    <form class="mt-8 space-y-6" (submit)="login()">
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div>
+          <label for="email-address" class="sr-only">Email</label>
+          <input id="email-address" name="email" type="email" autocomplete="email" required
+            class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 placeholder-gray-500 dark:placeholder-slate-400 text-gray-900 dark:text-slate-100 rounded-t-md focus:outline-none focus:ring-futuristic-primary focus:border-futuristic-primary focus:z-10 sm:text-sm"
+            placeholder="Email">
+        </div>
+        <div>
+          <label for="password" class="sr-only">Senha</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required
+            class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 placeholder-gray-500 dark:placeholder-slate-400 text-gray-900 dark:text-slate-100 rounded-b-md focus:outline-none focus:ring-futuristic-primary focus:border-futuristic-primary focus:z-10 sm:text-sm"
+            placeholder="Senha">
+        </div>
+      </div>
+
+      <div>
+        <button type="submit"
+          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-futuristic-primary hover:bg-futuristic-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+          Entrar
+        </button>
+      </div>
+    </form>
+    <p class="mt-4 text-center text-sm text-futuristic-subtext dark:text-dark-subtext">
+      Não tem conta?
+      <a href="#" class="font-medium text-futuristic-primary hover:text-futuristic-secondary">
+        Criar conta
+      </a>
+    </p>
+  </div>
+</div>
