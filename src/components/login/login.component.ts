@@ -1,13 +1,12 @@
 
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   templateUrl: './login.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {
   userService = inject(UserService);

@@ -12,6 +12,7 @@ interface CreditPackage {
 
 @Component({
   selector: 'app-plans-modal',
+  standalone: true,
   templateUrl: './plans-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule]

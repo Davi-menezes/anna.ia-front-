@@ -13,6 +13,7 @@ interface CreditPackage {
 
 @Component({
   selector: 'app-header-credits-modal',
+  standalone: true,
   templateUrl: './header-credits-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule]

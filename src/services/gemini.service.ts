@@ -7,20 +7,26 @@ import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
 })
 export class GeminiService {
   private genAI: GoogleGenAI;
+  private apiKey?: string;
   loading = signal(false);
   error = signal<string | null>(null);
+
+  private readApiKey(): string | undefined {
+    const processLike = (globalThis as any).process;
+    return processLike?.env?.API_KEY;
+  }
 
   constructor() {
     // This is a placeholder for the API key. In a real app, this would be more secure.
     // The environment assumes process.env.API_KEY is available.
-    const apiKey = (process.env as any).API_KEY;
-    if (!apiKey) {
+    this.apiKey = this.readApiKey();
+    if (!this.apiKey) {
       console.error("API_KEY environment variable not set.");
       this.error.set("API Key not configured. Using mock data.");
       // This is a mock/dummy client, as there's no real process.env in browser.
       this.genAI = { models: { generateContent: async () => ({ text: "Desculpe, a IA está offline. Esta é uma resposta simulada." }) } } as any;
     } else {
-      this.genAI = new GoogleGenAI({ apiKey });
+      this.genAI = new GoogleGenAI({ apiKey: this.apiKey });
     }
   }
 
@@ -28,7 +34,7 @@ export class GeminiService {
     this.loading.set(true);
     this.error.set(null);
     try {
-      if ((process.env as any).API_KEY) {
+      if (this.apiKey) {
         const response: GenerateContentResponse = await this.genAI.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: `Você é Anna, uma assistente de estudos amigável e prestativa para estudantes brasileiros. Responda de forma clara e concisa. Pergunta do usuário: ${prompt}`,

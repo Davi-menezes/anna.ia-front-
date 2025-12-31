@@ -10,12 +10,14 @@ import { Vestibular } from '../../models/vestibular.model';
 import { GeminiService } from '../../services/gemini.service';
 import { UserService } from '../../services/user.service';
 import { CreditsModalComponent } from '../credits-modal/credits-modal.component';
+import { TiltDirective } from '../../directives/tilt.directive';
 
 @Component({
   selector: 'app-home',
+  standalone: true,
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, CommonModule, CreditsModalComponent, RouterLink]
+  imports: [FormsModule, CommonModule, CreditsModalComponent, RouterLink, TiltDirective]
 })
 export class HomeComponent {
   geminiService = inject(GeminiService);

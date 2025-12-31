@@ -7,6 +7,7 @@ import { HeaderCreditsModalComponent } from '../header-credits-modal/header-cred
 
 @Component({
   selector: 'app-header',
+  standalone: true,
   templateUrl: './header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, HeaderCreditsModalComponent]

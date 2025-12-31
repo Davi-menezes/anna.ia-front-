@@ -5,6 +5,7 @@ import { Vestibular } from '../../models/vestibular.model';
 
 @Component({
   selector: 'app-vestibulares',
+  standalone: true,
   templateUrl: './vestibulares.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],

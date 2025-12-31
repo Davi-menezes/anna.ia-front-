@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
+  standalone: true,
   templateUrl: './profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule]

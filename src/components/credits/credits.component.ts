@@ -12,6 +12,7 @@ interface CreditPackage {
 
 @Component({
   selector: 'app-credits',
+  standalone: true,
   templateUrl: './credits.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule]
