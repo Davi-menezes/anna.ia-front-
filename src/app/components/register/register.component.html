@@ -1,0 +1,107 @@
+<div
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-futuristic-primary/10 to-futuristic-secondary/10 dark:from-slate-900/50 dark:to-slate-800/50 py-12 px-4 sm:px-6 lg:px-8 relative">
+  <!-- Background Effects -->
+  <div
+    class="absolute top-1/4 left-1/4 w-96 h-96 bg-futuristic-primary/20 rounded-full blur-3xl animate-pulse delay-700">
+  </div>
+  <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-futuristic-secondary/20 rounded-full blur-3xl animate-pulse">
+  </div>
+
+  <div class="max-w-md w-full space-y-8 relative z-10">
+    <div
+      class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/40 dark:border-slate-700/50 p-8">
+      <div class="text-center">
+
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Crie sua conta
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          Ou
+          <a [routerLink]="['/login']" class="font-medium text-indigo-600 hover:text-indigo-500">
+            faça login na sua conta existente
+          </a>
+        </p>
+      </div>
+
+      <form class="mt-8 space-y-6" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="rounded-md shadow-sm space-y-4">
+          <!-- Name -->
+          <div>
+            <label for="name" class="sr-only">Nome completo</label>
+            <input id="name" name="name" type="text" formControlName="name"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="Nome completo" required>
+            <div *ngIf="name?.invalid && (name?.dirty || name?.touched)" class="text-red-500 text-xs mt-1">
+              <div *ngIf="name?.errors?.['required']">Nome é obrigatório</div>
+              <div *ngIf="name?.errors?.['minlength']">Nome deve ter pelo menos 3 caracteres</div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email-address" class="sr-only">E-mail</label>
+            <input id="email-address" name="email" type="email" autocomplete="email" formControlName="email"
+              [class.border-red-500]="email?.errors?.['emailInUse']" [class.ring-2]="email?.errors?.['emailInUse']"
+              [class.ring-red-500]="email?.errors?.['emailInUse']"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="E-mail" required>
+            <div *ngIf="(email?.invalid && (email?.dirty || email?.touched)) || email?.errors?.['emailInUse']"
+              class="text-red-500 text-xs mt-1">
+              <div *ngIf="email?.errors?.['required']">E-mail é obrigatório</div>
+              <div *ngIf="email?.errors?.['email']">Por favor, insira um e-mail válido</div>
+              <div *ngIf="email?.errors?.['emailInUse']" class="font-medium">
+                <i class="fas fa-exclamation-circle mr-1"></i> Este e-mail já está cadastrado
+              </div>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="sr-only">Senha</label>
+            <input id="password" name="password" type="password" formControlName="password"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="Senha" required>
+            <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="text-red-500 text-xs mt-1">
+              <div *ngIf="password?.errors?.['required']">Senha é obrigatória</div>
+              <div *ngIf="password?.errors?.['minlength']">Senha deve ter pelo menos 6 caracteres</div>
+              <div *ngIf="password?.errors?.['pattern']">
+                A senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div>
+            <label for="confirm-password" class="sr-only">Confirme a senha</label>
+            <input id="confirm-password" name="confirmPassword" type="password" formControlName="confirmPassword"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="Confirme a senha" required>
+            <div *ngIf="(confirmPassword?.dirty || confirmPassword?.touched) && registerForm.errors?.['mismatch']"
+              class="text-red-500 text-xs mt-1">
+              As senhas não conferem
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="error" class="text-red-500 text-sm text-center">
+          {{ error }}
+        </div>
+
+        <div>
+          <button type="submit" [disabled]="registerForm.invalid || isLoading"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+            <span *ngIf="!isLoading">Criar conta</span>
+            <span *ngIf="isLoading">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>

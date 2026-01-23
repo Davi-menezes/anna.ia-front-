@@ -1,62 +1,68 @@
-
 @if (isOpen()) {
-  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4" (click)="onClose()">
-    <div 
-      class="w-full max-w-3xl p-8 space-y-8 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-white/40 dark:border-slate-700 transform transition-all" 
-      role="dialog" 
-      aria-modal="true"
-      (click)="$event.stopPropagation()">
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+  (click)="onClose()">
+  <div
+    class="w-full max-w-3xl p-8 space-y-8 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-white/40 dark:border-slate-700 transform transition-all"
+    role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
 
-      <div class="flex justify-between items-center">
-        <h3 class="text-2xl font-bold text-futuristic-text dark:text-dark-text">Planos e Preços</h3>
-        <button (click)="onClose()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700">
-          <svg class="w-6 h-6 text-futuristic-subtext dark:text-dark-subtext" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
-
-      <!-- Credit Packages -->
-      <div>
-        <h4 class="text-lg font-semibold text-futuristic-text dark:text-dark-text mb-4">Pacotes de Créditos</h4>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          @for (pkg of packages; track pkg.amount) {
-            <div 
-              class="relative flex flex-col p-6 text-center bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700">
-              @if (pkg.popular) {
-                <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-                  <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium bg-futuristic-secondary text-white">
-                    Popular
-                  </span>
-                </div>
-              }
-              <div class="flex-1">
-                <h3 class="text-xl font-semibold text-futuristic-primary">{{ pkg.amount }} Créditos</h3>
-                <div class="mt-4">
-                  <span class="text-3xl font-bold text-futuristic-text dark:text-dark-text">{{ pkg.price }}</span>
-                </div>
-              </div>
-              <button (click)="goToCreditsPage(pkg)" class="mt-6 w-full py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-futuristic-primary hover:bg-futuristic-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                Comprar
-              </button>
-            </div>
-          }
-        </div>
-      </div>
-      
-      <!-- Token Pricing -->
-      <div class="pt-6 border-t border-gray-200 dark:border-slate-700">
-        <h4 class="text-lg font-semibold text-futuristic-text dark:text-dark-text mb-2">Como os créditos funcionam?</h4>
-        <p class="text-futuristic-subtext dark:text-dark-subtext">
-          Usamos um sistema simples para que você possa focar no que importa: aprender.
-        </p>
-        <ul class="mt-4 space-y-2 text-futuristic-subtext dark:text-dark-subtext list-disc list-inside">
-          <li><span class="font-semibold text-futuristic-text dark:text-dark-text">1 Pergunta no Chat</span> = 1 Crédito</li>
-          <li><span class="font-semibold text-futuristic-text dark:text-dark-text">1 Resposta de Simulado</span> = 1 Crédito</li>
-        </ul>
-        <p class="mt-4 text-xs text-gray-400 dark:text-slate-500">
-          Cada crédito cobre o custo de processamento da sua solicitação pela inteligência artificial (uso de tokens). Os pacotes oferecem a melhor taxa para suas interações.
-        </p>
-      </div>
-
+    <div class="flex justify-between items-center">
+      <h3 class="text-2xl font-bold text-futuristic-text dark:text-dark-text">Planos e Preços</h3>
+      <button (click)="onClose()" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700">
+        <svg class="w-6 h-6 text-futuristic-subtext dark:text-dark-subtext" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
     </div>
+
+    <!-- Credit Packages -->
+    <div>
+      <h4 class="text-lg font-semibold text-futuristic-text dark:text-dark-text mb-4">Pacotes de Créditos</h4>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        @for (pkg of packages; track pkg.amount) {
+        <div
+          class="relative flex flex-col p-6 text-center bg-gray-50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700">
+          @if (pkg.popular) {
+          <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
+            <span
+              class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-medium bg-futuristic-secondary text-white">
+              Popular
+            </span>
+          </div>
+          }
+          <div class="flex-1">
+            <h3 class="text-xl font-semibold text-futuristic-primary">{{ pkg.amount }} Créditos</h3>
+            <div class="mt-4">
+              <span class="text-3xl font-bold text-futuristic-text dark:text-dark-text">{{ pkg.price }}</span>
+            </div>
+          </div>
+          <button (click)="goToCreditsPage(pkg)"
+            class="mt-6 w-full py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-futuristic-primary hover:bg-futuristic-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+            Comprar
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Token Pricing -->
+    <div class="pt-6 border-t border-gray-200 dark:border-slate-700">
+      <h4 class="text-lg font-semibold text-futuristic-text dark:text-dark-text mb-2">Como os créditos funcionam?</h4>
+      <p class="text-futuristic-subtext dark:text-dark-subtext">
+        Usamos um sistema simples para que você possa focar no que importa: aprender.
+      </p>
+      <ul class="mt-4 space-y-2 text-futuristic-subtext dark:text-dark-subtext list-disc list-inside">
+        <li><span class="font-semibold text-futuristic-text dark:text-dark-text">1 Pergunta no Chat</span> = 0,5
+          Créditos</li>
+        <li><span class="font-semibold text-futuristic-text dark:text-dark-text">1 Resposta de Simulado</span> = 0,3
+          Créditos</li>
+      </ul>
+      <p class="mt-4 text-xs text-gray-400 dark:text-slate-500">
+        Cada crédito cobre o custo de processamento da sua solicitação pela inteligência artificial (uso de tokens). Os
+        pacotes oferecem a melhor taxa para suas interações.
+      </p>
+    </div>
+
   </div>
+</div>
 }

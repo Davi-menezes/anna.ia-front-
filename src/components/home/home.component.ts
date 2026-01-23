@@ -2,10 +2,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 import { ChatMessage } from '../../models/chat.model';
 import { Simulado } from '../../models/simulado.model';
+import { QUESTIONS_POOL } from '../../models/questions.data';
 import { Vestibular } from '../../models/vestibular.model';
 import { GeminiService } from '../../services/gemini.service';
 import { UserService } from '../../services/user.service';
@@ -24,18 +25,17 @@ export class HomeComponent {
   userService = inject(UserService);
 
   userInput = signal('');
-  messages = signal<ChatMessage[]>([
-    { role: 'model', content: 'Olá! Como posso ajudar você a estudar hoje?' }
-  ]);
-  
-  simulados = signal<Simulado[]>([
-    { id: 1, subject: 'Matemática', question: 'Qual é o resultado de 7 x 8?', options: ['54', '56', '62', '64'], correctAnswerIndex: 1, explanation: '7 multiplicado por 8 resulta em 56. Esta é uma tabuada fundamental.' },
-    { id: 2, subject: 'Português', question: 'Qual palavra é um substantivo próprio?', options: ['Cachorro', 'Cidade', 'Brasil', 'Amor'], correctAnswerIndex: 2, explanation: 'Brasil é um substantivo próprio pois nomeia um lugar específico (país).' },
-    { id: 3, subject: 'Física', question: 'Qual é a fórmula da Segunda Lei de Newton?', options: ['E = mc²', 'V = R * i', 'S = So + v*t', 'F = m * a'], correctAnswerIndex: 3, explanation: 'A Segunda Lei de Newton, ou Princípio Fundamental da Dinâmica, estabelece que a força resultante (F) é igual ao produto da massa (m) pela aceleração (a).' },
-    { id: 4, subject: 'História', question: 'Em que ano o Brasil se tornou independente?', options: ['1822', '1500', '1889', '1930'], correctAnswerIndex: 0, explanation: 'A Independência do Brasil foi proclamada em 7 de setembro de 1822 por Dom Pedro I.' },
-  ]);
-  
-  selectedSimulado = signal<Simulado | null>(null);
+  messages = signal<ChatMessage[]>([]);
+  hasStartedChat = computed(() => this.messages().length > 1); // > 1 because 1 is the greeting
+
+  // Use a map or object to store the pool, and a signal for the *current* display list
+  allQuestions = QUESTIONS_POOL;
+  simulados = signal<Simulado[]>([]);
+
+  // Exam Modal State
+  selectedSubject = signal<string | null>(null);
+  currentExamQuestions = signal<Simulado[]>([]);
+  currentQuestionIndex = signal<number>(0);
   selectedAnswer = signal<number | null>(null);
 
   vestibulares = signal<Vestibular[]>([
@@ -67,13 +67,45 @@ export class HomeComponent {
 
   vestibularesPreview = computed(() => this.vestibulares().slice(0, 3));
 
+  constructor(private router: Router) {
+    this.setGreeting();
+    this.refreshQuestions();
+  }
+
+  setGreeting() {
+    const hour = new Date().getHours();
+    let timeGreeting = 'Olá';
+    if (hour >= 5 && hour < 12) timeGreeting = 'Bom dia';
+    else if (hour >= 12 && hour < 18) timeGreeting = 'Boa tarde';
+    else timeGreeting = 'Boa noite';
+
+    this.messages.set([
+      { role: 'model', content: `${timeGreeting}! Como está o processo de estudos?` }
+    ]);
+  }
+
+  refreshQuestions() {
+    // Pick one random question from each subject for the dashboard cards
+    const subjects = Object.keys(this.allQuestions);
+    const randomQuestions: Simulado[] = subjects.map((subject, index) => {
+      const questions = this.allQuestions[subject];
+      const randomQ = questions[Math.floor(Math.random() * questions.length)];
+      return { id: index, ...randomQ };
+    });
+    this.simulados.set(randomQuestions);
+  }
+
   async sendMessage() {
+    if (!this.userService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     const prompt = this.userInput().trim();
     if (!prompt) return;
 
-    if (!this.userService.useCredit()) {
-        return; // Modal will be shown via credit check
-    }
+    // Credit deduction is now handled by the backend in GeminiService.
+    // We update the local message list immediately for better UX.
 
     this.messages.update(msgs => [...msgs, { role: 'user', content: prompt }]);
     this.userInput.set('');
@@ -82,22 +114,85 @@ export class HomeComponent {
     this.messages.update(msgs => [...msgs, { role: 'model', content: response }]);
   }
 
-  selectSimulado(simulado: Simulado) {
-    if (this.userService.credits() <= 0) {
-        this.userService.isOutOfCreditsModalOpen.set(true);
-        return;
+  openExam(subject: string) {
+    if (!this.userService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
     }
-    this.selectedSimulado.set(simulado);
+
+    if (this.userService.credits() < 0.3) {
+      this.userService.isOutOfCreditsModalOpen.set(true);
+      return;
+    }
+    this.selectedSubject.set(subject);
+
+    // Load questions for this subject and shuffle them
+    const questions = [...(this.allQuestions[subject] || [])];
+    this.shuffleArray(questions);
+
+    // Map to Simulado type (add IDs)
+    const examQuestions: Simulado[] = questions.map((q, i) => ({ id: i, ...q }));
+
+    this.currentExamQuestions.set(examQuestions);
+    this.currentQuestionIndex.set(0);
     this.selectedAnswer.set(null);
   }
 
-  submitAnswer(optionIndex: number) {
+  closeExam() {
+    this.selectedSubject.set(null);
+    this.currentExamQuestions.set([]);
+    this.currentQuestionIndex.set(0);
+    this.selectedAnswer.set(null);
+  }
+
+  async submitAnswer(optionIndex: number) {
     if (this.selectedAnswer() !== null) return;
 
-    if (!this.userService.useCredit()) {
-        return; // Modal will be shown
+    // Deduct 0.3 credits for each simulation answer
+    const success = await this.userService.deductCredits(0.3);
+    if (!success) {
+      return;
     }
-    
+
     this.selectedAnswer.set(optionIndex);
+  }
+
+  nextQuestion() {
+    const current = this.currentQuestionIndex();
+    if (current < this.currentExamQuestions().length - 1) {
+      this.currentQuestionIndex.set(current + 1);
+      this.selectedAnswer.set(null);
+    }
+  }
+
+  prevQuestion() {
+    const current = this.currentQuestionIndex();
+    if (current > 0) {
+      this.currentQuestionIndex.set(current - 1);
+      // We might want to save state if they go back, but simple version resets or keeps?
+      // For simplicity, let's reset answer state when moving or we need an array of answers.
+      // Current requirement: "mudar as questões todas as vezes que reinicia o site" -> implied persistent session not strict.
+      // Let's reset for now to allow re-trying or just simple navigation.
+      // Better ux: keep answers? That requires an array of user answers. 
+      // Let's stick to simple: next/prev resets state for that question view if not implemented fully.
+      // Actually, standard quiz: once answered, stay answered.
+      // I will reset for simplicity as user just asked for "30 questions modal", not full quiz state engine.
+      this.selectedAnswer.set(null);
+    }
+  }
+
+  get currentQuestion(): Simulado | undefined {
+    return this.currentExamQuestions()[this.currentQuestionIndex()];
+  }
+
+  openPlans() {
+    this.router.navigate(['/credits']);
+  }
+
+  private shuffleArray(array: any[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
   }
 }

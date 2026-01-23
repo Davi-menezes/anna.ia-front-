@@ -2,12 +2,15 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
+import { NotificationService } from '../../app/services/notification.service';
+import { AuthService } from '../../app/services/auth.service';
 
 interface CreditPackage {
   amount: number;
   price: string;
   description: string;
   popular?: boolean;
+  paymentLink: string;
 }
 
 @Component({
@@ -15,22 +18,84 @@ interface CreditPackage {
   standalone: true,
   templateUrl: './credits.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule]
+  imports: [CommonModule],
+  styles: [`
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  `]
 })
 export class CreditsComponent {
   userService = inject(UserService);
+  authService = inject(AuthService);
+  notificationService = inject(NotificationService);
 
   packages: CreditPackage[] = [
-    { amount: 10, price: 'R$ 4,99', description: 'Para começar.' },
-    { amount: 50, price: 'R$ 19,99', description: 'Melhor custo-benefício.', popular: true },
-    { amount: 100, price: 'R$ 34,99', description: 'Para estudantes dedicados.' },
+    {
+      amount: 10,
+      price: 'R$ 4,99',
+      description: 'Para começar.',
+      paymentLink: 'https://mpago.la/1zuxEKQ'
+    },
+    {
+      amount: 50,
+      price: 'R$ 19,99',
+      description: 'Melhor custo-benefício.',
+      popular: true,
+      paymentLink: 'https://mpago.la/1YGYeLu'
+    },
+    {
+      amount: 100,
+      price: 'R$ 34,99',
+      description: 'Para estudantes dedicados.',
+      paymentLink: 'https://mpago.la/1tfqe2y'
+    },
+    {
+      amount: 999,
+      price: 'R$ 49,90',
+      description: 'Plano Premium: IA e Plano de Estudos Ilimitados.',
+      paymentLink: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=142b689221fd40dba4fdcfd272339f4c'
+    }
   ];
 
-  // FIX: Use constructor injection for Router to fix type inference issue.
-  constructor(private router: Router) {}
+  get userId(): string | null {
+    const user = this.authService.getCurrentUserValue();
+    return user ? user.id : null;
+  }
 
-  buyCredits(amount: number) {
-    this.userService.addCredits(amount);
-    this.router.navigate(['/profile']); // Navigate to profile to see the new balance
+  // FIX: Use constructor injection for Router to fix type inference issue.
+  constructor(private router: Router) { }
+
+  getPackagePriceString(amount: number): string {
+    const pkg = this.packages.find(p => p.amount === amount);
+    return pkg ? pkg.price.replace('R$ ', '') : '0,00';
+  }
+
+  async buyCredits(pkg: CreditPackage) {
+    if (!this.userService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const userId = this.userId;
+    if (!userId) {
+      this.notificationService.showError('Erro ao identificar usuário. Por favor, faça login novamente.');
+      return;
+    }
+
+    // Append external_reference to the payment link
+    const separator = pkg.paymentLink.includes('?') ? '&' : '?';
+    const finalLink = `${pkg.paymentLink}${separator}external_reference=${userId}`;
+
+    window.open(finalLink, '_blank');
+  }
+
+  getPackagePrice(amount: number): number {
+    const pkg = this.packages.find(p => p.amount === amount);
+    if (!pkg) return 0;
+    // Extract number from "R$ 4,99"
+    return parseFloat(pkg.price.replace('R$ ', '').replace(',', '.'));
   }
 }

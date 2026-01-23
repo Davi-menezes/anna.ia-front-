@@ -1,13 +1,40 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="utf-8" />
-  <title>Anna.IA</title>
+  <title>Anna.IA - Seu Assistente de Estudos Inteligente</title>
   <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+    content="Anna.IA é o seu assistente de estudos pessoal que cria planos personalizados, resolve dúvidas e ajuda você a conquistar seus objetivos acadêmicos com inteligência artificial." />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+  <style>
+    .success-snackbar {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .error-snackbar {
+      background-color: #f44336;
+      color: white;
+    }
+
+    /* Hide scrollbar globally */
+    *::-webkit-scrollbar {
+      display: none !important;
+    }
+
+    * {
+      -ms-overflow-style: none !important;
+      /* IE and Edge */
+      scrollbar-width: none !important;
+      /* Firefox */
+    }
+  </style>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -25,11 +52,21 @@
           },
           animation: {
             'glow': 'glow 2s ease-in-out infinite alternate',
+            'progress-indefinite': 'progress-indefinite 2s linear infinite',
+            'fade-in': 'fade-in 0.5s ease-out forwards',
           },
           keyframes: {
             glow: {
               '0%, 100%': { opacity: 0.7 },
               '50%': { opacity: 1 },
+            },
+            'progress-indefinite': {
+              '0%': { transform: 'translateX(-100%)' },
+              '100%': { transform: 'translateX(100%)' }
+            },
+            'fade-in': {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
             }
           }
         }
@@ -38,12 +75,14 @@
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    html, body {
-        font-family: 'Inter', sans-serif;
-        scroll-behavior: smooth;
+
+    html,
+    body {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
     }
   </style>
-<script type="importmap">
+  <script type="importmap">
 {
   "imports": {
     "rxjs": "https://esm.sh/rxjs@^7.8.2?conditions=es2015",
@@ -64,7 +103,9 @@
 }
 </script>
 </head>
+
 <body class="bg-futuristic-bg dark:bg-dark-bg text-futuristic-text dark:text-dark-text antialiased">
   <app-root></app-root>
 </body>
+
 </html>

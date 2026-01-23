@@ -1,0 +1,290 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+
+    <!-- Header -->
+    <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-futuristic-text dark:text-dark-text">Meu Plano de Estudos Premium</h1>
+        <p class="text-futuristic-subtext dark:text-dark-subtext">IA-Powered Adaptive Learning</p>
+    </div>
+
+    <!-- Wizard Steps -->
+    @if (!activePlan() && step() < 4) { <div
+        class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/40 dark:border-slate-700/50">
+
+        <!-- Stepper Indicator -->
+        <div class="flex items-center justify-between mb-12 max-w-md mx-auto">
+            <div [class]="step() >= 1 ? 'step-active' : 'step-inactive'"
+                class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors">1</div>
+            <div [class]="step() >= 2 ? 'bg-futuristic-primary' : 'bg-gray-200 dark:bg-slate-700'"
+                class="flex-1 h-1 mx-2"></div>
+            <div [class]="step() >= 2 ? 'step-active' : 'step-inactive'"
+                class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors">2</div>
+            <div [class]="step() >= 3 ? 'bg-futuristic-primary' : 'bg-gray-200 dark:bg-slate-700'"
+                class="flex-1 h-1 mx-2"></div>
+            <div [class]="step() >= 3 ? 'step-active' : 'step-inactive'"
+                class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors">3</div>
+        </div>
+
+        <!-- Step 1: Goals -->
+        @if (step() === 1) {
+        <div>
+            <h2 class="text-2xl font-semibold mb-6">Qual seu objetivo principal?</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Vestibular Alvo</label>
+                    <input type="text" [(ngModel)]="setupData.targetVestibular" placeholder="Ex: ENEM, FATEC, FUVEST..."
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:ring-2 focus:ring-futuristic-primary outline-none">
+                </div>
+            </div>
+            <div class="mt-8 flex justify-end">
+                <button (click)="step.set(2)" [disabled]="!setupData.targetVestibular"
+                    class="px-8 py-3 bg-futuristic-primary text-white rounded-xl disabled:opacity-50">Próximo</button>
+            </div>
+        </div>
+        }
+
+        <!-- Step 2: Time -->
+        @if (step() === 2) {
+        <div>
+            <h2 class="text-2xl font-semibold mb-6">Sua disponibilidade</h2>
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-3">Dias de Estudo</label>
+                    <div class="flex flex-wrap gap-2">
+                        @for (day of daysOfWeek; track day.id) {
+                        <button (click)="toggleDay(day.id)"
+                            [class]="setupData.studyDays.includes(day.id) ? 'bg-futuristic-primary text-white' : 'bg-gray-100 dark:bg-slate-900 text-gray-500'"
+                            class="px-4 py-2 rounded-lg font-medium transition-colors">
+                            {{ day.name }}
+                        </button>
+                        }
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Minutos por dia: {{ setupData.availableTimePerDay
+                        }}min</label>
+                    <input type="range" min="30" max="480" step="30" [(ngModel)]="setupData.availableTimePerDay"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-futuristic-primary">
+                </div>
+            </div>
+            <div class="mt-8 flex justify-between">
+                <button (click)="step.set(1)" class="px-8 py-3 text-gray-500 underline">Voltar</button>
+                <button (click)="step.set(3)" [disabled]="setupData.studyDays.length === 0"
+                    class="px-8 py-3 bg-futuristic-primary text-white rounded-xl disabled:opacity-50">Próximo</button>
+            </div>
+        </div>
+        }
+
+        <!-- Step 3: Subjects Diagnostic -->
+        @if (step() === 3) {
+        <div>
+            <h2 class="text-2xl font-semibold mb-4">Como está seu nível em cada matéria?</h2>
+            <p class="text-sm text-futuristic-subtext mb-6">Isso ajuda a IA a equilibrar seu tempo.</p>
+            <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                @for (subject of setupData.subjects; track subject.name) {
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-900 rounded-xl">
+                    <span class="font-medium">{{ subject.name }}</span>
+                    <select [(ngModel)]="subject.level"
+                        class="bg-transparent text-sm font-bold text-futuristic-primary outline-none">
+                        <option [value]="1">Iniciante</option>
+                        <option [value]="2">Básico</option>
+                        <option [value]="3">Médio</option>
+                        <option [value]="4">Avançado</option>
+                        <option [value]="5">Expert</option>
+                    </select>
+                </div>
+                }
+            </div>
+            <div class="mt-8 flex justify-between">
+                <button (click)="step.set(2)" class="px-8 py-3 text-gray-500 underline">Voltar</button>
+                <button (click)="finishSetup()" [disabled]="isLoading()"
+                    class="px-8 py-3 bg-gradient-to-r from-futuristic-primary to-futuristic-secondary text-white rounded-xl shadow-lg">
+                    @if (isLoading()) { <i class="fas fa-spinner fa-spin mr-2"></i> Criando Plano... }
+                    @else { Finalizar }
+                </button>
+            </div>
+        </div>
+        }
+</div>
+}
+
+<!-- Active Dashboard -->
+@if (activePlan() || step() === 4) {
+<div class="space-y-10 animate-fade-in">
+
+    <!-- Hero Section: Mentor Message -->
+    <div
+        class="relative overflow-hidden bg-white/40 dark:bg-slate-800/40 backdrop-blur-lg rounded-3xl p-1 border border-white/40 dark:border-slate-700/50 shadow-2xl">
+        <div
+            class="bg-gradient-to-br from-futuristic-primary/10 via-transparent to-futuristic-secondary/10 p-8 rounded-3xl">
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <div class="relative">
+                    <div
+                        class="h-24 w-24 rounded-2xl bg-gradient-to-tr from-futuristic-primary to-futuristic-secondary flex items-center justify-center shadow-lg transform -rotate-6">
+                        <i class="fas fa-robot text-4xl text-white"></i>
+                    </div>
+                    <div
+                        class="absolute -bottom-2 -right-2 h-8 w-8 bg-green-500 rounded-full border-4 border-white dark:border-slate-800 flex items-center justify-center">
+                        <div class="h-2 w-2 bg-white rounded-full animate-pulse"></div>
+                    </div>
+                </div>
+                <div class="flex-1 text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-futuristic-text dark:text-dark-text mb-2">
+                        Bem-vindo de volta, {{ userService.user()?.name?.split(' ')[0] }}!
+                    </h3>
+                    <p class="text-lg text-futuristic-subtext dark:text-dark-subtext italic">
+                        "{{ weeklySchedule()?.content?.mentorMessage || 'Estou terminando de ajustar os últimos detalhes
+                        do seu cronograma de elite...' }}"
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white/50 dark:bg-slate-900/50 p-4 rounded-2xl border border-white/20">
+                    <span class="text-xs uppercase tracking-wider text-futuristic-subtext">Meta da Semana</span>
+                    <p class="font-bold text-futuristic-primary mt-1">{{ weeklySchedule()?.content?.weekGoal || 'Foco
+                        total!' }}</p>
+                </div>
+                <div class="bg-white/50 dark:bg-slate-900/50 p-4 rounded-2xl border border-white/20">
+                    <span class="text-xs uppercase tracking-wider text-futuristic-subtext">Vestibular</span>
+                    <p class="font-bold text-futuristic-text dark:text-dark-text mt-1">{{ activePlan()?.targetVestibular
+                        }}</p>
+                </div>
+                <div class="bg-white/50 dark:bg-slate-900/50 p-4 rounded-2xl border border-white/20">
+                    <span class="text-xs uppercase tracking-wider text-futuristic-subtext">Status da IA</span>
+                    <p class="font-bold text-green-500 mt-1 flex items-center gap-2">
+                        <span class="h-2 w-2 bg-green-500 rounded-full"></span> Online & Monitorando
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Focus -->
+    <div>
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-futuristic-text dark:text-dark-text flex items-center gap-2">
+                <i class="fas fa-calendar-day text-futuristic-primary"></i> Cronograma Semanal
+            </h3>
+            <div class="flex flex-col items-end">
+                <button (click)="generateSchedule()" [disabled]="isLoading()"
+                    [class.animate-pulse]="needsRecalibration()" [class.ring-4]="needsRecalibration()"
+                    [class.ring-amber-500/50]="needsRecalibration()"
+                    class="group relative px-6 py-2 bg-white dark:bg-slate-800 text-sm font-black text-futuristic-primary rounded-xl border-2 border-futuristic-primary/20 hover:border-futuristic-primary transition-all flex items-center gap-2">
+                    <i class="fas fa-sync-alt" [class.fa-spin]="isLoading()"></i>
+                    Recalibrar Plano
+                    @if (needsRecalibration()) {
+                    <span
+                        class="absolute -top-12 right-0 bg-amber-500 text-white text-[10px] px-3 py-1 rounded-lg shadow-xl animate-bounce whitespace-nowrap">
+                        IA Sugere Ajuste! 🧠
+                    </span>
+                    }
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            @for (day of weeklySchedule()?.content?.days; track day.day) {
+            <div [class.ring-4]="isCurrentDay(day.day)" [class.ring-futuristic-primary/30]="isCurrentDay(day.day)"
+                class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-[2.5rem] p-10 border border-white/50 dark:border-slate-700/50 shadow-2xl relative transition-all hover:scale-[1.01]">
+
+                @if (isCurrentDay(day.day)) {
+                <div
+                    class="absolute -top-4 left-10 bg-gradient-to-r from-futuristic-primary to-futuristic-secondary text-white text-[10px] px-5 py-2 rounded-full uppercase font-black tracking-[0.2em] shadow-lg animate-fade-in">
+                    Foco de Hoje
+                </div>
+                }
+
+                <h4
+                    class="text-3xl font-black capitalize mb-8 flex justify-between items-center text-futuristic-text dark:text-dark-text border-b border-slate-100 dark:border-slate-700 pb-4">
+                    {{ day.day }}
+                    <span
+                        class="text-xs bg-slate-200/50 dark:bg-slate-700/50 px-4 py-2 rounded-2xl font-black text-futuristic-subtext">
+                        {{ day.subjects.length }} matérias
+                    </span>
+                </h4>
+
+                <div class="space-y-10">
+                    @for (subj of day.subjects; track subj.name) {
+                    <div class="group relative pl-8">
+                        <div
+                            class="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-futuristic-primary to-futuristic-secondary rounded-full transform group-hover:scale-y-110 transition-transform duration-300">
+                        </div>
+
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span
+                                    class="block font-black text-2xl text-futuristic-text dark:text-dark-text group-hover:text-futuristic-primary transition-colors">{{
+                                    subj.name }}</span>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    @for (topic of subj.topics; track topic) {
+                                    <span
+                                        class="text-[11px] font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1 text-futuristic-subtext shadow-sm tracking-wide">{{
+                                        topic }}</span>
+                                    }
+                                </div>
+                            </div>
+                            <span
+                                class="text-sm font-black text-white bg-slate-900 dark:bg-futuristic-primary px-4 py-2 rounded-xl shadow-md min-w-[70px] text-center">{{
+                                subj.time }}min</span>
+                        </div>
+
+                        <div
+                            class="mt-4 bg-indigo-50/50 dark:bg-indigo-900/10 p-5 rounded-[1.5rem] border border-indigo-100/50 dark:border-indigo-500/10 group-hover:bg-indigo-100/30 transition-colors">
+                            <p
+                                class="text-[13px] text-indigo-700 dark:text-indigo-300 font-bold leading-relaxed flex items-start gap-3">
+                                <i class="fas fa-lightbulb text-amber-500 mt-1"></i>
+                                <span>{{ subj.tips }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+
+    <!-- Feedback Section -->
+    <div class="bg-slate-900 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform duration-700">
+            <i class="fas fa-brain text-9xl"></i>
+        </div>
+
+        <div class="relative z-10">
+            <h3 class="text-2xl font-bold mb-2">Check-in de Evolução</h3>
+            <p class="text-slate-400 mb-8">Como foi o seu rendimento hoje? Seja sincero para eu ajustar sua carga de
+                estudos!</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                @for (subject of activePlan()?.subjects; track subject.id) {
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 hover:border-white/20 transition-colors">
+                    <span class="block font-medium mb-4 text-slate-200">{{ subject.subjectName }}</span>
+                    <div class="flex justify-between items-center gap-2">
+                        <button (click)="updatePerformance(subject.subjectName, 'bad')"
+                            class="group flex flex-col items-center flex-1 p-2 rounded-xl border border-transparent hover:bg-red-500/20 hover:border-red-500/30 transition-all">
+                            <span class="text-2xl mb-1 group-hover:scale-125 transition-transform">😫</span>
+                            <span
+                                class="text-[10px] uppercase font-bold text-slate-400 group-hover:text-red-400">Péssimo</span>
+                        </button>
+                        <button (click)="updatePerformance(subject.subjectName, 'average')"
+                            class="group flex flex-col items-center flex-1 p-2 rounded-xl border border-transparent hover:bg-yellow-500/20 hover:border-yellow-500/30 transition-all">
+                            <span class="text-2xl mb-1 group-hover:scale-125 transition-transform">😐</span>
+                            <span
+                                class="text-[10px] uppercase font-bold text-slate-400 group-hover:text-yellow-400">Ok</span>
+                        </button>
+                        <button (click)="updatePerformance(subject.subjectName, 'good')"
+                            class="group flex flex-col items-center flex-1 p-2 rounded-xl border border-transparent hover:bg-green-500/20 hover:border-green-500/30 transition-all">
+                            <span class="text-2xl mb-1 group-hover:scale-125 transition-transform">🤩</span>
+                            <span
+                                class="text-[10px] uppercase font-bold text-slate-400 group-hover:text-green-400">Venci</span>
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+}
+</div>

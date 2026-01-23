@@ -36,5 +36,45 @@ export class VestibularesComponent {
       examDates: ['1ª fase: 20 de Outubro de 2024', '2ª fase: 1 e 2 de Dezembro de 2024'],
       officialSiteUrl: 'https://www.comvest.unicamp.br/'
     },
+    {
+      acronym: 'FATEC',
+      name: 'Vestibular FATEC',
+      description: 'Processo seletivo para as Faculdades de Tecnologia do Estado de São Paulo. Foco em cursos tecnológicos de alta qualidade.',
+      registrationPeriod: 'Maio a Junho (2º Semestre 2024)',
+      examDates: ['30 de Junho de 2024'],
+      officialSiteUrl: 'https://www.vestibularfatec.com.br/'
+    },
+    {
+      acronym: 'UNESP',
+      name: 'Vestibular UNESP',
+      description: 'Processo seletivo para a Universidade Estadual Paulista, uma das maiores e mais importantes universidades do Brasil.',
+      registrationPeriod: 'Setembro a Outubro de 2024',
+      examDates: ['1ª fase: 15 de Novembro de 2024', '2ª fase: 8 e 9 de Dezembro de 2024'],
+      officialSiteUrl: 'https://www.vunesp.com.br/unesp'
+    },
+    {
+      acronym: 'VUNESP',
+      name: 'Fundação Vunesp',
+      description: 'Organiza vestibulares para diversas instituições, incluindo carreiras militares e prefeituras, além da UNESP.',
+      registrationPeriod: 'Variável por edital',
+      examDates: ['Consultar edital específico'],
+      officialSiteUrl: 'https://www.vunesp.com.br/'
+    },
+    {
+      acronym: 'MACKENZIE',
+      name: 'Vestibular Mackenzie',
+      description: 'Processo seletivo para a Universidade Presbiteriana Mackenzie, uma das instituições de ensino mais tradicionais de São Paulo.',
+      registrationPeriod: 'Abril a Maio (2º Semestre 2024)',
+      examDates: ['Junho de 2024'],
+      officialSiteUrl: 'https://www.mackenzie.br/processos-seletivos/vestibular-graduacao/'
+    },
+    {
+      acronym: 'PUC',
+      name: 'Vestibular PUC',
+      description: 'Processo seletivo para as Pontifícias Universidades Católicas, reconhecidas pela excelência acadêmica e humana.',
+      registrationPeriod: 'Outubro a Novembro de 2024',
+      examDates: ['Dezembro de 2024'],
+      officialSiteUrl: 'https://www.pucsp.br/vestibular'
+    },
   ]);
 }

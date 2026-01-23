@@ -1,8 +1,23 @@
+<div
+  class="relative min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-purple-900/30 overflow-hidden">
 
-<div class="relative min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-900 dark:to-purple-900/30">
-  <app-header></app-header>
-  <main class="pt-24">
-    <router-outlet></router-outlet>
-  </main>
-  <app-credits-modal></app-credits-modal>
-</div>
+  <!-- Global Background Effects -->
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+    <div
+      class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-futuristic-primary/40 rounded-full blur-[100px] animate-pulse delay-700 dark:mix-blend-screen dark:bg-futuristic-primary/20">
+    </div>
+    <div
+      class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-futuristic-secondary/40 rounded-full blur-[100px] animate-pulse dark:mix-blend-screen dark:bg-futuristic-secondary/20">
+    </div>
+    <div
+      class="absolute top-[40%] left-[60%] w-[300px] h-[300px] bg-purple-500/40 rounded-full blur-[80px] animate-pulse delay-1000 dark:mix-blend-screen dark:bg-purple-500/20">
+    </div>
+  </div>
+
+  <div class="relative z-10">
+    <app-header></app-header>
+    <main class="pt-24">
+      <router-outlet></router-outlet>
+    </main>
+    <app-credits-modal></app-credits-modal>
+  </div>

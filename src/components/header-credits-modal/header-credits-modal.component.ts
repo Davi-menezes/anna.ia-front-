@@ -36,6 +36,7 @@ export class HeaderCreditsModalComponent {
     { amount: 10, price: 'R$ 4,99', description: 'Para começar.' },
     { amount: 50, price: 'R$ 19,99', description: 'Melhor custo-benefício.', popular: true },
     { amount: 100, price: 'R$ 34,99', description: 'Para estudantes dedicados.' },
+    { amount: 999, price: 'R$ 49,90', description: 'Plano Premium: IA e Plano de Estudos Ilimitados.' },
   ];
 
   constructor(private router: Router) {}

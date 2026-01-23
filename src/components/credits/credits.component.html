@@ -1,30 +1,47 @@
+<div class="min-h-screen py-20 px-4 bg-slate-50 dark:bg-[#0a0f1e]">
+  <div class="w-full max-w-6xl mx-auto text-center">
+    <h1 class="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">Escolha seu pacote de créditos</h1>
+    <p class="text-base text-slate-500 dark:text-slate-400 mb-16">Adicione créditos para continuar usando a Anna.IA</p>
 
-<div class="min-h-screen flex flex-col items-center justify-center pt-24 pb-12 px-4">
-  <div class="w-full max-w-4xl text-center">
-    <h1 class="text-4xl md:text-5xl font-bold text-futuristic-text dark:text-dark-text">Obtenha mais créditos</h1>
-    <p class="mt-4 text-lg text-futuristic-subtext dark:text-dark-subtext">Escolha um pacote para continuar sua jornada de aprendizado.</p>
-
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       @for (pkg of packages; track pkg.amount) {
-        <div class="relative flex flex-col p-8 bg-white/60 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-white/30 dark:border-slate-700/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-          @if (pkg.popular) {
-            <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-              <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-futuristic-secondary text-white">
-                Popular
-              </span>
+      <div class="relative flex flex-col h-full group">
+        <!-- Badge Popular -->
+        @if (pkg.popular) {
+        <div class="absolute -top-3 left-0 right-0 z-30 flex justify-center">
+          <span
+            class="inline-block whitespace-nowrap bg-futuristic-primary text-white text-[10px] font-black uppercase tracking-[0.2em] px-5 py-2 rounded-full shadow-xl border border-white/20 transform-gpu transition-transform group-hover:scale-110">
+            Mais Popular
+          </span>
+        </div>
+        }
+
+        <!-- Card Container -->
+        <div
+          class="flex-1 flex flex-col p-8 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl backdrop-blur-xl transition-all duration-300 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] group-hover:border-futuristic-primary/30 h-full overflow-visible">
+          <div class="flex flex-col items-center text-center h-full">
+            <h3 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-6">
+              {{ pkg.amount === 999 ? 'Acesso Ilimitado' : pkg.amount + ' Créditos' }}
+            </h3>
+
+            <div class="text-4xl font-black text-slate-900 dark:text-white mb-3">
+              {{ pkg.price }}
             </div>
-          }
-          <div class="flex-1">
-            <h3 class="text-2xl font-semibold text-futuristic-primary">{{ pkg.amount }} Créditos</h3>
-            <p class="mt-4 text-futuristic-subtext dark:text-dark-subtext">{{ pkg.description }}</p>
-            <div class="mt-6">
-              <span class="text-4xl font-bold text-futuristic-text dark:text-dark-text">{{ pkg.price }}</span>
+
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-10 leading-relaxed min-h-[3rem]">
+              {{ pkg.description }}
+            </p>
+
+            <!-- Payment Button -->
+            <div class="mt-auto w-full flex justify-center min-h-[50px]">
+              <button (click)="buyCredits(pkg)"
+                class="w-full max-w-[200px] h-12 bg-futuristic-primary hover:bg-futuristic-secondary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg active:scale-95">
+                {{ pkg.amount === 999 ? 'Assinar' : 'Comprar' }}
+              </button>
             </div>
           </div>
-          <button (click)="buyCredits(pkg.amount)" class="mt-8 w-full py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-futuristic-primary hover:bg-futuristic-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-            Comprar Agora
-          </button>
         </div>
+      </div>
       }
     </div>
   </div>

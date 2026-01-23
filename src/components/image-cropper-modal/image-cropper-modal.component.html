@@ -1,0 +1,91 @@
+<div *ngIf="isOpen"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+    (click)="onClose()">
+
+    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-white/20 dark:border-slate-700/50"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-slate-700/50">
+            <h3 class="text-xl font-bold text-futuristic-text dark:text-dark-text">Editar Foto</h3>
+            <button (click)="onClose()"
+                class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6">
+            <div
+                class="relative rounded-2xl overflow-hidden bg-gray-50 dark:bg-slate-900 border-2 border-dashed border-gray-200 dark:border-slate-700 min-h-[300px] flex items-center justify-center">
+                <div *ngIf="loading()"
+                    class="absolute inset-0 flex items-center justify-center z-10 bg-white/50 dark:bg-slate-800/50">
+                    <div
+                        class="w-8 h-8 border-4 border-futuristic-primary border-t-transparent rounded-full animate-spin">
+                    </div>
+                </div>
+
+                <image-cropper [imageFile]="imageFile" [maintainAspectRatio]="true" [aspectRatio]="1 / 1"
+                    [resizeToWidth]="400" [imageQuality]="90" [roundCropper]="true" [canvasRotation]="0"
+                    [transform]="transform()" format="jpeg" (imageCropped)="imageCropped($event)"
+                    (imageLoaded)="imageLoaded($event)" (loadImageFailed)="loadImageFailed()"
+                    class="max-w-full"></image-cropper>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-6 flex flex-wrap justify-center gap-2">
+                <button (click)="zoomOut()"
+                    class="p-3 rounded-xl bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                    title="Zoom Menos">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+                    </svg>
+                </button>
+                <button (click)="zoomIn()"
+                    class="p-3 rounded-xl bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                    title="Zoom Mais">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                    </svg>
+                </button>
+                <button (click)="rotate()"
+                    class="p-3 rounded-xl bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                    title="Girar">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
+                <button (click)="flipH()"
+                    class="p-3 rounded-xl bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                    title="Inverter Horizontal">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16V4m0 12l-3-3m3 3l3-3M17 8V20m0-12l-3 3m3-3l3-3" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 bg-gray-50 dark:bg-slate-900/50 flex gap-3">
+            <button (click)="onClose()"
+                class="flex-1 py-3 px-4 rounded-2xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                Cancelar
+            </button>
+            <button (click)="save()" [disabled]="!croppedImage()"
+                class="flex-1 py-3 px-4 rounded-2xl bg-futuristic-primary text-white font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-futuristic-primary/20">
+                Salvar Foto
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,61 +1,127 @@
-
-<div class="min-h-screen flex items-center justify-center pt-24 pb-12 px-4">
-  <div class="w-full max-w-4xl p-8 bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-2xl border border-white/40 dark:border-slate-700/50">
+<div class="flex items-center justify-center pt-24 pb-12 px-4">
+  <div
+    class="w-full max-w-4xl p-8 bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-2xl border border-white/40 dark:border-slate-700/50">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      
+
       <!-- Coluna da Esquerda: Foto e Nome -->
       <div class="md:col-span-1 flex flex-col items-center text-center">
         <div class="relative">
-          <img class="h-32 w-32 rounded-full object-cover shadow-lg border-4 border-white dark:border-slate-700" src="https://picsum.photos/seed/anna-ia/200" alt="Foto de Perfil">
-          <button class="absolute bottom-1 right-1 h-8 w-8 bg-futuristic-primary rounded-full text-white flex items-center justify-center hover:bg-futuristic-secondary transition">
+          <img class="h-32 w-32 rounded-full object-cover shadow-lg border-4 border-white dark:border-slate-700"
+            [src]="userService.getProfilePictureUrl()" alt="Foto de Perfil">
+          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="hidden">
+          <button (click)="fileInput.click()" [disabled]="isLoading()"
+            class="absolute bottom-1 right-1 h-8 w-8 bg-futuristic-primary rounded-full text-white flex items-center justify-center hover:bg-futuristic-secondary transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-1.586-1.586a2 2 0 112.828-2.828l3-3zM3 14a2 2 0 112 2H3a2 2 0 01-2-2v-2a2 2 0 114 0v2z" />
-              <path d="M3 10a2 2 0 112-2h1.586a2 2 0 011.414.586l1.586 1.586a2 2 0 11-2.828 2.828l-3-3A2 2 0 013 10zm11.414 4a2 2 0 11-2.828-2.828l3-3a2 2 0 112.828 2.828l-3 3z" />
+              <path
+                d="M13.586 3.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0l-1.586-1.586a2 2 0 112.828-2.828l3-3zM3 14a2 2 0 112 2H3a2 2 0 01-2-2v-2a2 2 0 114 0v2z" />
+              <path
+                d="M3 10a2 2 0 112-2h1.586a2 2 0 011.414.586l1.586 1.586a2 2 0 11-2.828 2.828l-3-3A2 2 0 013 10zm11.414 4a2 2 0 11-2.828-2.828l3-3a2 2 0 112.828 2.828l-3 3z" />
             </svg>
           </button>
         </div>
-        <h2 class="mt-4 text-2xl font-bold text-futuristic-text dark:text-dark-text">Ana Oliveira</h2>
-        <p class="mt-1 text-sm text-futuristic-subtext dark:text-dark-subtext">Cursando o 3º ano, foco no ENEM.</p>
+        <h2 class="mt-4 text-2xl font-bold text-futuristic-text dark:text-dark-text">{{ userService.user()?.name }}</h2>
+        <p class="mt-1 text-sm text-futuristic-subtext dark:text-dark-subtext">{{ userService.user()?.mainGoal ||
+          'Estudante focado em evoluir.' }}</p>
       </div>
 
       <!-- Coluna da Direita: Detalhes e Ações -->
       <div class="md:col-span-2 space-y-8">
         <div>
-          <h3 class="text-xl font-semibold text-futuristic-text dark:text-dark-text border-b border-gray-200 dark:border-slate-700 pb-2">Detalhes do Perfil</h3>
+          <div class="flex justify-between items-center border-b border-gray-200 dark:border-slate-700 pb-2">
+            <h3 class="text-xl font-semibold text-futuristic-text dark:text-dark-text">Detalhes do Perfil</h3>
+            @if (!isEditing()) {
+            <button (click)="editProfile()" class="text-sm text-futuristic-primary hover:underline">Editar</button>
+            }
+          </div>
+
           <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+            @if (!isEditing()) {
             <div>
               <label class="font-medium text-futuristic-subtext dark:text-dark-subtext">Nome Completo</label>
-              <p class="text-futuristic-text dark:text-dark-text">Ana Clara Oliveira Santos</p>
+              <p class="text-futuristic-text dark:text-dark-text">{{ userService.user()?.name }}</p>
+            </div>
+            <div>
+              <label class="font-medium text-futuristic-subtext dark:text-dark-subtext">Email</label>
+              <p class="text-futuristic-text dark:text-dark-text">{{ userService.user()?.email }}</p>
             </div>
             <div>
               <label class="font-medium text-futuristic-subtext dark:text-dark-subtext">Data de Nascimento</label>
-              <p class="text-futuristic-text dark:text-dark-text">15/05/2007 (17 anos)</p>
+              <p class="text-futuristic-text dark:text-dark-text">{{ (userService.user()?.birthDate | date:'dd/MM/yyyy')
+                || 'Não informada' }}</p>
             </div>
             <div>
               <label class="font-medium text-futuristic-subtext dark:text-dark-subtext">Escolaridade</label>
-              <p class="text-futuristic-text dark:text-dark-text">3º Ano do Ensino Médio</p>
+              <p class="text-futuristic-text dark:text-dark-text">{{ userService.user()?.education || 'Não informada' }}
+              </p>
             </div>
-             <div>
+            <div>
               <label class="font-medium text-futuristic-subtext dark:text-dark-subtext">Localização</label>
-              <p class="text-futuristic-text dark:text-dark-text">Salvador, BA</p>
+              <p class="text-futuristic-text dark:text-dark-text">{{ userService.user()?.location || 'Não informada' }}
+              </p>
             </div>
             <div class="sm:col-span-2">
               <label class="font-medium text-futuristic-subtext dark:text-dark-subtext">Objetivo Principal</label>
-              <p class="text-futuristic-text dark:text-dark-text">Aprovação em Medicina (ENEM 2024)</p>
+              <p class="text-futuristic-text dark:text-dark-text">{{ userService.user()?.mainGoal || 'Não informado' }}
+              </p>
             </div>
+            } @else {
+            <div class="sm:col-span-1">
+              <label class="block font-medium text-futuristic-subtext dark:text-dark-subtext mb-1">Data de
+                Nascimento</label>
+              <input type="date" [(ngModel)]="editForm().birthDate"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg dark:bg-slate-900 dark:text-white">
+            </div>
+            <div class="sm:col-span-1">
+              <label class="block font-medium text-futuristic-subtext dark:text-dark-subtext mb-1">Escolaridade</label>
+              <input type="text" [(ngModel)]="editForm().education" placeholder="Ex: Ensino Médio Completo"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg dark:bg-slate-900 dark:text-white">
+            </div>
+            <div class="sm:col-span-1">
+              <label class="block font-medium text-futuristic-subtext dark:text-dark-subtext mb-1">Localização</label>
+              <input type="text" [(ngModel)]="editForm().location" placeholder="Ex: São Paulo, SP"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg dark:bg-slate-900 dark:text-white">
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block font-medium text-futuristic-subtext dark:text-dark-subtext mb-1">Objetivo
+                Principal</label>
+              <textarea [(ngModel)]="editForm().mainGoal" placeholder="Ex: Passar em Medicina na USP"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg dark:bg-slate-900 dark:text-white h-24"></textarea>
+            </div>
+            <div class="sm:col-span-2 flex justify-end gap-2 mt-2">
+              <button (click)="isEditing.set(false)"
+                class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Cancelar</button>
+              <button (click)="saveProfile()" [disabled]="isLoading()"
+                class="px-4 py-2 bg-futuristic-primary text-white text-sm font-medium rounded-lg hover:bg-futuristic-secondary transition-colors disabled:opacity-50">
+                @if (isLoading()) { <i class="fas fa-spinner fa-spin mr-2"></i> }
+                Salvar Alterações
+              </button>
+            </div>
+            }
           </div>
         </div>
 
         <div>
-          <h3 class="text-xl font-semibold text-futuristic-text dark:text-dark-text border-b border-gray-200 dark:border-slate-700 pb-2">Créditos e Conta</h3>
+          <h3
+            class="text-xl font-semibold text-futuristic-text dark:text-dark-text border-b border-gray-200 dark:border-slate-700 pb-2">
+            Créditos e Conta</h3>
           <div class="mt-4">
-             <p class="text-futuristic-subtext dark:text-dark-subtext text-sm">Você tem {{ userService.credits() }} de {{ userService.maxCredits }} créditos restantes (no plano gratuito).</p>
+            @if (userService.isPremium()) {
+            <p class="text-futuristic-subtext dark:text-dark-subtext text-sm">
+              Seu plano atual é <span class="text-futuristic-primary font-bold">Premium</span>. Você possui
+              <span class="text-2xl font-black text-futuristic-primary mx-1">∞</span> créditos disponíveis.
+            </p>
+            } @else {
+            <p class="text-futuristic-subtext dark:text-dark-subtext text-sm">
+              Você tem {{ userService.credits() | number:'1.0-2' }} de {{ userService.maxCredits | number:'1.0-2' }}
+              créditos restantes (no plano gratuito).
+            </p>
             <div class="mt-2 w-full bg-gray-200 dark:bg-slate-700 rounded-full h-4">
-              <div 
-                class="bg-gradient-to-r from-futuristic-secondary to-futuristic-primary h-4 rounded-full transition-all duration-500" 
+              <div
+                class="bg-gradient-to-r from-futuristic-secondary to-futuristic-primary h-4 rounded-full transition-all duration-500"
                 [style.width.%]="creditPercentage()">
               </div>
             </div>
+            }
           </div>
           <div class="mt-6 flex flex-col sm:flex-row gap-4">
             <button (click)="goToCreditsPage()"
@@ -73,3 +139,6 @@
     </div>
   </div>
 </div>
+
+<app-image-cropper-modal [isOpen]="isCropperOpen()" [imageFile]="selectedFile()" (close)="isCropperOpen.set(false)"
+  (cropped)="onImageCropped($event)"></app-image-cropper-modal>

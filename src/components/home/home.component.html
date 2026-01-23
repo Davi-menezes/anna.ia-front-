@@ -5,33 +5,36 @@
     <p class="text-xl text-futuristic-subtext dark:text-dark-subtext">Sua assistente de estudos pessoal</p>
   </div>
 
+
+
   <!-- Chat -->
-  <div class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-xl p-6 mb-8 border border-white/40 dark:border-slate-700/50">
-    <h2 class="text-2xl font-semibold text-futuristic-text dark:text-dark-text mb-4">Chat com a Anna</h2>
-    <div class="h-64 overflow-y-auto mb-4 p-4 bg-white/50 dark:bg-slate-900/50 rounded-lg">
+  <div
+    class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-xl p-6 mb-8 border border-white/40 dark:border-slate-700/50">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+      <h2 class="text-2xl font-semibold text-futuristic-text dark:text-dark-text">Chat com a Anna</h2>
+      <span class="text-xs font-medium text-futuristic-subtext bg-white/40 dark:bg-slate-900/40 px-3 py-1 rounded-full">
+        Consome 0,5 créditos por mensagem
+      </span>
+    </div>
+    <div
+      class="overflow-y-auto no-scrollbar mb-4 p-4 bg-white/50 dark:bg-slate-900/50 rounded-lg transition-all duration-500 ease-in-out"
+      [ngClass]="hasStartedChat() ? 'h-[650px]' : 'h-[200px]'">
       @for (message of messages(); track $index) {
-        <div [class]="message.role === 'user' ? 'text-right mb-4' : 'text-left mb-4'">
-          <div [class]="message.role === 'user' 
+      <div [class]="message.role === 'user' ? 'text-right mb-4' : 'text-left mb-4'">
+        <div [class]="message.role === 'user' 
             ? 'inline-block bg-futuristic-primary text-white px-4 py-2 rounded-lg rounded-tr-none' 
             : 'inline-block bg-gray-100 dark:bg-slate-700 px-4 py-2 rounded-lg rounded-tl-none'">
-            {{ message.content }}
-          </div>
+          {{ message.content }}
         </div>
+      </div>
       }
     </div>
     <div class="flex gap-2">
-      <input 
-        type="text" 
-        [ngModel]="userInput()" 
-        (ngModelChange)="userInput.set($event)"
-        (keyup.enter)="sendMessage()"
-        placeholder="Digite sua pergunta..." 
-        class="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-futuristic-primary focus:border-transparent dark:bg-slate-800 dark:text-white"
-      >
-      <button 
-        (click)="sendMessage()" 
-        class="px-6 py-2 bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors"
-      >
+      <input type="text" [ngModel]="userInput()" (ngModelChange)="userInput.set($event)" (keyup.enter)="sendMessage()"
+        placeholder="Digite sua pergunta..."
+        class="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-futuristic-primary focus:border-transparent dark:bg-slate-800 dark:text-white">
+      <button (click)="sendMessage()"
+        class="px-6 py-2 bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors">
         Enviar
       </button>
     </div>
@@ -42,15 +45,19 @@
     <h2 class="text-2xl font-semibold text-futuristic-text dark:text-dark-text mb-4">Simulados Rápidos</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       @for (simulado of simulados(); track simulado.id) {
-        <button
-          type="button"
-          appTilt
-          (click)="selectSimulado(simulado)"
-          class="text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60"
-        >
-          <h3 class="font-medium text-lg text-futuristic-text dark:text-dark-text mb-2">{{ simulado.subject }}</h3>
-          <p class="text-futuristic-subtext dark:text-dark-subtext text-sm">{{ simulado.question }}</p>
-        </button>
+      <button type="button" appTilt (click)="openExam(simulado.subject)"
+        class="text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60">
+        <h3 class="font-medium text-lg text-futuristic-text dark:text-dark-text mb-1">{{ simulado.subject }}</h3>
+        <p class="text-futuristic-subtext dark:text-dark-subtext text-xs mb-3">Simulado de 30 questões.</p>
+        <div
+          class="flex items-center gap-1.5 text-[10px] font-bold text-futuristic-primary/80 uppercase tracking-wider">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          0,3 créditos por resposta
+        </div>
+      </button>
       }
     </div>
   </div>
@@ -60,95 +67,171 @@
     <h2 class="text-2xl font-semibold text-futuristic-text dark:text-dark-text mb-4">Próximos Vestibulares</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       @for (vestibular of vestibularesPreview(); track vestibular.acronym) {
-        <a
-          appTilt
-          [href]="vestibular.officialSiteUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="block text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60"
-        >
-          <div class="font-bold text-lg text-futuristic-text dark:text-dark-text mb-2">{{ vestibular.acronym }}</div>
-          <p class="text-futuristic-subtext dark:text-dark-subtext text-sm mb-2">{{ vestibular.name }}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Inscrições: {{ vestibular.registrationPeriod }}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Provas: {{ vestibular.examDates[0] }}</p>
-        </a>
+      <a appTilt [href]="vestibular.officialSiteUrl" target="_blank" rel="noopener noreferrer"
+        class="block text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60">
+        <div class="font-bold text-lg text-futuristic-text dark:text-dark-text mb-2">{{ vestibular.acronym }}</div>
+        <p class="text-futuristic-subtext dark:text-dark-subtext text-sm mb-2">{{ vestibular.name }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Inscrições: {{ vestibular.registrationPeriod }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Provas: {{ vestibular.examDates[0] }}</p>
+      </a>
       }
     </div>
 
     <div class="mt-5 flex justify-center">
-      <a
-        [routerLink]="['/vestibulares']"
-        class="inline-flex items-center justify-center px-6 py-2 rounded-lg bg-white/60 dark:bg-slate-800/60 border border-white/40 dark:border-slate-700/50 text-futuristic-primary hover:bg-white/80 dark:hover:bg-slate-700/50 transition-colors"
-      >
+      <a [routerLink]="['/vestibulares']"
+        class="inline-flex items-center justify-center px-6 py-2 rounded-lg bg-white/60 dark:bg-slate-800/60 border border-white/40 dark:border-slate-700/50 text-futuristic-primary hover:bg-white/80 dark:hover:bg-slate-700/50 transition-colors">
         Ver todos os vestibulares
       </a>
     </div>
   </div>
 
+  <!-- Card do Plano de Estudos Premium -->
+  <div class="mb-12 relative overflow-hidden group">
+    <div
+      class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/40 dark:border-slate-700/50 transition-all duration-300"
+      [class.blur-md]="!userService.isPremium()" [class.brightness-75]="!userService.isPremium()">
+
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex-1">
+          <h2 class="text-3xl font-bold text-futuristic-text dark:text-dark-text mb-2">Plano de Estudos Inteligente</h2>
+          <p class="text-lg text-futuristic-subtext dark:text-dark-subtext mb-4">
+            Um cronograma adaptativo que evolui com você, focado nos seus objetivos e pontos de melhoria.
+          </p>
+          <ul class="space-y-2 mb-6 text-sm text-futuristic-subtext dark:text-dark-subtext">
+            <li class="flex items-center gap-2">
+              <i class="fas fa-check-circle text-green-500"></i> IA Mentora que monitora seu progresso
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fas fa-check-circle text-green-500"></i> Ajuste automático baseado em erros e acertos
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="fas fa-check-circle text-green-500"></i> Foco total no vestibular que você escolher
+            </li>
+          </ul>
+          @if (userService.isPremium()) {
+          <button [routerLink]="['/study-plan']"
+            class="px-8 py-3 bg-gradient-to-r from-futuristic-primary to-futuristic-secondary text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all transform hover:-translate-y-1">
+            Acessar Meu Plano
+          </button>
+          } @else {
+          <button (click)="openPlans()"
+            class="px-8 py-3 bg-gray-500 text-white font-bold rounded-xl cursor-not-allowed">
+            Desbloquear com Premium
+          </button>
+          }
+        </div>
+        <div class="hidden md:block">
+          <i class="fas fa-brain text-7xl text-futuristic-primary/20"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay para estado bloqueado -->
+    @if (!userService.isPremium()) {
+    <div (click)="openPlans()"
+      class="absolute inset-0 flex flex-col items-center justify-center bg-black/5 cursor-pointer group-hover:bg-black/10 transition-colors">
+      <div
+        class="bg-white dark:bg-slate-800 p-4 rounded-full shadow-2xl mb-4 transform group-hover:scale-110 transition-transform">
+        <i class="fas fa-lock text-3xl text-futuristic-primary"></i>
+      </div>
+      <div
+        class="bg-futuristic-primary text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+        Assine Premium para Desbloquear
+      </div>
+    </div>
+    }
+  </div>
+
   <div class="mb-8">
-    <h2 class="text-2xl font-semibold text-futuristic-text dark:text-dark-text mb-4">Sobre a Anna.IA</h2>
-    <div class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/40 dark:border-slate-700/50">
-      <p class="text-futuristic-subtext dark:text-dark-subtext leading-relaxed">
-        A Anna.IA nasceu da vontade de deixar o estudo mais leve, prático e constante. A ideia surgiu observando que muitos estudantes têm dificuldade em manter uma rotina, tirar dúvidas rápido e revisar conteúdos de forma objetiva.
-      </p>
-      <p class="mt-4 text-futuristic-subtext dark:text-dark-subtext leading-relaxed">
-        Nosso objetivo é ser uma assistente de estudos que ajude você a organizar o caminho, praticar com simulados rápidos e ter um apoio no dia a dia. A proposta é simples: menos fricção para estudar, mais clareza para evoluir.
-      </p>
+    <h2 class="text-2xl font-semibold text-futuristic-text dark:text-dark-text mb-4">A Jornada da Anna.IA</h2>
+    <div
+      class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/40 dark:border-slate-700/50 relative overflow-hidden">
+      <div class="relative z-10">
+        <p class="text-futuristic-subtext dark:text-dark-subtext leading-relaxed text-lg">
+          A Anna.IA não nasceu apenas de linhas de código, mas de uma necessidade real. Ela foi idealizada a partir da
+          frustração e do desafio do nosso criador, que ao tentar se preparar para vestibulares como os da
+          <strong>Unoeste</strong> e
+          da <strong>Fatec</strong>, sentiu na pele o peso de não saber por onde começar.
+        </p>
+        <p class="mt-4 text-futuristic-subtext dark:text-dark-subtext leading-relaxed">
+          Entre livros, apostilas e a dúvida constante sobre o que realmente priorizar, surgiu o sonho: criar uma
+          companheira inteligente que pudesse guiar outros estudantes nessa mesma travessia, tornando o caminho mais
+          claro, leve e eficiente.
+        </p>
+        <p
+          class="mt-4 text-futuristic-subtext dark:text-dark-subtext leading-relaxed font-medium italic text-futuristic-primary">
+          Estamos aqui para transformar a sua dor em evolução, e a sua dúvida em aprovação.
+        </p>
+      </div>
+      <div class="absolute -right-8 -bottom-8 opacity-5 transform rotate-12">
+        <i class="fas fa-graduation-cap text-9xl"></i>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Modal de Simulado -->
-@if (selectedSimulado()) {
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md">
-      <h3 class="text-xl font-semibold text-futuristic-text dark:text-dark-text mb-4">
-        {{ selectedSimulado()?.subject }}
+@if (selectedSubject()) {
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold text-futuristic-text dark:text-dark-text">
+        {{ selectedSubject() }} <span class="text-sm font-normal text-gray-500">({{ currentQuestionIndex() + 1 }}/{{
+          currentExamQuestions().length }})</span>
       </h3>
-      <p class="mb-6 text-futuristic-subtext dark:text-dark-subtext">
-        {{ selectedSimulado()?.question }}
-      </p>
-      
-      <div class="space-y-3 mb-6">
-        @for (option of (selectedSimulado()?.options ?? []); track $index) {
-          <button
-            (click)="submitAnswer($index)"
-            [disabled]="selectedAnswer() !== null"
-            [class.bg-futuristic-primary]="selectedAnswer() === $index"
-            [class.text-white]="selectedAnswer() === $index"
-            [class.border-futuristic-primary]="selectedAnswer() === null"
-            [class.border-green-500]="selectedAnswer() === $index && $index === selectedSimulado()?.correctAnswerIndex"
-            [class.border-red-500]="selectedAnswer() === $index && $index !== selectedSimulado()?.correctAnswerIndex && selectedAnswer() !== null"
-            class="w-full text-left p-3 border rounded-lg transition-colors disabled:opacity-70"
-          >
-            {{ option }}
-          </button>
-        }
-      </div>
-
-      @if (selectedAnswer() !== null) {
-        <div class="p-4 rounded-lg mb-6" 
-             [class.bg-green-100]="selectedAnswer() === selectedSimulado()?.correctAnswerIndex"
-             [class.text-green-800]="selectedAnswer() === selectedSimulado()?.correctAnswerIndex"
-             [class.bg-red-100]="selectedAnswer() !== selectedSimulado()?.correctAnswerIndex"
-             [class.text-red-800]="selectedAnswer() !== selectedSimulado()?.correctAnswerIndex">
-          <p class="font-medium">
-            {{ selectedAnswer() === selectedSimulado()?.correctAnswerIndex ? "Resposta correta! 🎉" : "Resposta incorreta. Tente novamente!" }}
-          </p>
-          <p class="mt-2 text-sm">{{ selectedSimulado()?.explanation }}</p>
-        </div>
-      }
-
-      <div class="flex justify-end gap-3">
-        <button 
-          (click)="selectedSimulado.set(null)" 
-          class="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-        >
-          Fechar
-        </button>
-      </div>
+      <button (click)="closeExam()"
+        class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
+
+    @if (currentQuestion; as question) {
+    <p class="mb-6 text-futuristic-subtext dark:text-dark-subtext font-medium text-lg">
+      {{ question.question }}
+    </p>
+
+    <div class="space-y-3 mb-6">
+      @for (option of question.options; track $index) {
+      <button (click)="submitAnswer($index)" [disabled]="selectedAnswer() !== null"
+        [class.bg-futuristic-primary]="selectedAnswer() === $index" [class.text-white]="selectedAnswer() === $index"
+        [class.border-futuristic-primary]="selectedAnswer() === null"
+        [class.border-green-500]="selectedAnswer() === $index && $index === question.correctAnswerIndex"
+        [class.border-red-500]="selectedAnswer() === $index && $index !== question.correctAnswerIndex && selectedAnswer() !== null"
+        class="w-full text-left p-3 border rounded-lg transition-colors disabled:opacity-90">
+        {{ option }}
+      </button>
+      }
+    </div>
+
+    @if (selectedAnswer() !== null) {
+    <div class="p-4 rounded-lg mb-6" [class.bg-green-100]="selectedAnswer() === question.correctAnswerIndex"
+      [class.text-green-800]="selectedAnswer() === question.correctAnswerIndex"
+      [class.bg-red-100]="selectedAnswer() !== question.correctAnswerIndex"
+      [class.text-red-800]="selectedAnswer() !== question.correctAnswerIndex">
+      <p class="font-medium">
+        {{ selectedAnswer() === question.correctAnswerIndex ? "Resposta correta! 🎉" : "Resposta incorreta." }}
+      </p>
+      <p class="mt-2 text-sm">{{ question.explanation }}</p>
+    </div>
+    }
+
+    <div class="flex justify-between mt-6">
+      <button (click)="prevQuestion()" [disabled]="currentQuestionIndex() === 0"
+        class="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        Anterior
+      </button>
+
+      <button (click)="nextQuestion()" [disabled]="currentQuestionIndex() === currentExamQuestions().length - 1"
+        class={`px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary
+        transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}>
+        Próxima
+      </button>
+    </div>
+    }
   </div>
+</div>
 }
 
 <app-credits-modal></app-credits-modal>
