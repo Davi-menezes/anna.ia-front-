@@ -21,7 +21,13 @@
           },
           "configurations": {
             "production": {
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -36,7 +42,10 @@
           "options": {
             "port": 3000,
             "host": "localhost",
-            "allowedHosts": ["102b11fadc1c.ngrok-free.app", ".ngrok-free.app"]
+            "allowedHosts": [
+              "102b11fadc1c.ngrok-free.app",
+              ".ngrok-free.app"
+            ]
           },
           "configurations": {
             "production": {
