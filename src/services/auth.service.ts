@@ -56,9 +56,12 @@ export class AuthService {
 
   register(name: string, email: string, password: string, terms: boolean, extraData?: any): Observable<User> {
     const payload = { name, email, password, terms, ...extraData };
+    console.log('AuthService: Iniciando registro...', payload.email);
     return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, payload).pipe(
       map(response => {
+        console.log('AuthService: Resposta recebida do backend:', response);
         if (!response.success || !response.user) {
+          console.error('AuthService: Falha na validação da resposta:', response);
           throw new Error(response.message || 'Falha no cadastro');
         }
         return response.user;

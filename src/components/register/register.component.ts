@@ -325,14 +325,17 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     const registerSub = this.authService.register(name, email, password, termsValue, { birthDate: formattedBirthDate, education, location, mainGoal }).subscribe({
       next: (user) => {
+        console.log('RegisterComponent: Sucesso no registro!', user);
         this.isSubmitting = false;
         this.cdr.markForCheck();
         // Redirect to verification sent page with email in query params
+        console.log('RegisterComponent: Redirecionando para /verification-sent...');
         this.router.navigate(['/verification-sent'], {
           queryParams: { email: user.email }
         });
       },
       error: (error) => {
+        console.error('RegisterComponent: Erro no registro:', error);
         this.isSubmitting = false;
 
         // Extract error message and code
