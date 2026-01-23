@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://reluctant-dusty-annaia-e8d116f4.koyeb.app/api/v1',
+  apiUrl: 'https://anna-ia-back.onrender.com/api/v1',
   frontendUrl: 'https://annaia.vercel.app',
   mercadopagoPublicKey: 'APP_USR-fadad404-de6b-43d8-a949-7b2976282a31',
   googleClientId: '4913856119180299',
