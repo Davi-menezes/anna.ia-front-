@@ -340,44 +340,29 @@ export class RegisterComponent implements OnInit, OnDestroy {
         }
       },
       error: (error) => {
-        console.error('RegisterComponent: Erro no registro:', error);
+        console.error('RegisterComponent: Erro capturado no registro:', error);
         this.isSubmitting = false;
 
         // Extract error message and code
         const errorCode = error.code || error.error?.code;
 
         if (errorCode === 'EMAIL_IN_USE') {
-          // Show specific message and redirect to login with email prefilled
-          this.error = `O e-mail ${email} já está cadastrado. Você será redirecionado para a página de login...`;
+          this.error = `O e-mail ${email} já está cadastrado. Redirecionando para login...`;
           this.cdr.markForCheck();
-
-          // Redirect to login after a short delay
           setTimeout(() => {
             this.router.navigate(['/login'], {
-              queryParams: {
-                email: email,
-                emailInUse: 'true'
-              }
+              queryParams: { email: email, emailInUse: 'true' }
             });
           }, 2000);
         } else {
-          // Handle validation errors from backend
-          let errorMessage = 'Ocorreu um erro ao criar sua conta. Por favor, tente novamente.';
-
-          if (error.error?.errors && Array.isArray(error.error.errors)) {
-            // Backend validation errors - mostrar todos os erros
-            const validationErrors = error.error.errors.map((err: any) => {
-              const field = err.param || err.path || '';
-              const msg = err.msg || err.message || '';
-              return field ? `${field}: ${msg}` : msg;
-            }).join('. ');
-            errorMessage = validationErrors || errorMessage;
+          let errorMessage = 'Ocorreu um erro ao criar sua conta. Tente novamente.';
+          if (error.status === 0) {
+            errorMessage = 'Sem conexão com o servidor. Verifique sua internet.';
           } else if (error.error?.message) {
             errorMessage = error.error.message;
           } else if (error.message) {
             errorMessage = error.message;
           }
-
           this.error = errorMessage;
           this.cdr.markForCheck();
         }
