@@ -16,7 +16,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { authGuard } from './guards/auth.guard';
 
 export const APP_ROUTES: Routes = [
-  { path: '', component: HomeComponent, title: 'Anna.IA - Início', canActivate: [authGuard] },
+  { path: '', component: HomeComponent, title: 'Anna.IA - Início' },
   { path: 'login', component: LoginComponent, title: 'Anna.IA - Login' },
   { path: 'forgot-password', component: ForgotPasswordComponent, title: 'Anna.IA - Recuperar senha' },
   { path: 'reset-password', component: ResetPasswordComponent, title: 'Anna.IA - Redefinir senha' },

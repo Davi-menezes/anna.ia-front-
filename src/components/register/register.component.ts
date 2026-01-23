@@ -291,14 +291,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
       mainGoal: ['', [Validators.required, Validators.minLength(5)]],
       terms: [false, [Validators.requiredTrue]]
     });
-
-    // Remove scroll strictly
-    document.body.style.overflow = 'hidden';
   }
 
   ngOnDestroy() {
-    // Restore scroll
-    document.body.style.overflow = 'auto';
     this.subscriptions.unsubscribe();
   }
 
@@ -328,11 +323,21 @@ export class RegisterComponent implements OnInit, OnDestroy {
         console.log('RegisterComponent: Sucesso no registro!', user);
         this.isSubmitting = false;
         this.cdr.markForCheck();
-        // Redirect to verification sent page with email in query params
-        console.log('RegisterComponent: Redirecionando para /verification-sent...');
-        this.router.navigate(['/verification-sent'], {
-          queryParams: { email: user.email }
-        });
+
+        try {
+          console.log('RegisterComponent: Tentando redirecionar para /verification-sent...');
+          this.router.navigate(['/verification-sent'], {
+            queryParams: { email: user.email }
+          }).then(success => {
+            console.log('RegisterComponent: Redirecionamento completo. Sucesso?', success);
+            if (!success) {
+              this.error = 'Ocorreu um problema ao carregar a página de confirmação, mas sua conta foi criada.';
+            }
+          });
+        } catch (navError) {
+          console.error('RegisterComponent: Erro fatal no roteamento:', navError);
+          this.error = 'Conta criada! Verifique seu e-mail (Erro de navegação).';
+        }
       },
       error: (error) => {
         console.error('RegisterComponent: Erro no registro:', error);

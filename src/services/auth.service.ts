@@ -56,8 +56,11 @@ export class AuthService {
 
   register(name: string, email: string, password: string, terms: boolean, extraData?: any): Observable<User> {
     const payload = { name, email, password, terms, ...extraData };
-    console.log('AuthService: Iniciando registro...', payload.email);
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, payload).pipe(
+    const targetUrl = `${this.apiUrl}/auth/register`;
+    console.log('AuthService: Enviando registro para:', targetUrl);
+    console.log('AuthService: Payload:', { ...payload, password: '***' });
+
+    return this.http.post<AuthResponse>(targetUrl, payload).pipe(
       map(response => {
         console.log('AuthService: Resposta recebida do backend:', response);
         if (!response.success || !response.user) {

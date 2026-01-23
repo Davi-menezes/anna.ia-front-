@@ -23,16 +23,19 @@
       color: white;
     }
 
-    /* Hide scrollbar globally */
+    /* Hide scrollbar globally but allow scrolling */
     *::-webkit-scrollbar {
       display: none !important;
     }
 
     * {
       -ms-overflow-style: none !important;
-      /* IE and Edge */
       scrollbar-width: none !important;
-      /* Firefox */
+    }
+
+    body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
     }
   </style>
   <script>

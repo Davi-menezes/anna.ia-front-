@@ -27,8 +27,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
 
   ngOnInit() {
-    // Remove scroll
-    document.body.style.overflow = 'hidden';
   }
 
   login() {
@@ -90,8 +88,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Restore scroll
-    document.body.style.overflow = 'auto';
     // Clean up subscriptions
     this.subscriptions.unsubscribe();
   }
