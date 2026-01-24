@@ -1,0 +1,78 @@
+@import "tailwindcss/index.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@theme {
+    --color-futuristic-bg: #f0f4f8;
+    --color-futuristic-primary: #4f46e5;
+    --color-futuristic-secondary: #7c3aed;
+    --color-futuristic-text: #0f172a;
+    --color-futuristic-subtext: #64748b;
+    --color-dark-bg: #0f172a;
+    --color-dark-text: #f1f5f9;
+    --color-dark-subtext: #94a3b8;
+
+    --animate-glow: glow 2s ease-in-out infinite alternate;
+    --animate-progress-indefinite: progress-indefinite 2s linear infinite;
+    --animate-fade-in: fade-in 0.5s ease-out forwards;
+
+    @keyframes glow {
+
+        0%,
+        100% {
+            opacity: 0.7;
+        }
+
+        50% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes progress-indefinite {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    @keyframes fade-in {
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+.success-snackbar {
+    background-color: #4caf50;
+    color: white;
+}
+
+.error-snackbar {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Hide scrollbar globally but allow scrolling */
+*::-webkit-scrollbar {
+    display: none !important;
+}
+
+* {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+}
+
+body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
+}
