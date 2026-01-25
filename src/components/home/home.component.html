@@ -28,12 +28,12 @@
       </div>
       }
     </div>
-    <div class="flex flex-col sm:flex-row gap-2">
+    <div class="flex flex-col sm:flex-row gap-3 w-full">
       <input type="text" [ngModel]="userInput()" (ngModelChange)="userInput.set($event)" (keyup.enter)="sendMessage()"
         placeholder="Digite sua pergunta..."
-        class="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-futuristic-primary focus:border-transparent dark:bg-slate-800 dark:text-white">
+        class="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-futuristic-primary focus:border-transparent dark:bg-slate-800 dark:text-white w-full">
       <button (click)="sendMessage()"
-        class="px-6 py-3 bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors font-medium sm:w-auto w-full">
+        class="px-6 py-3 bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors font-medium w-full sm:w-auto whitespace-nowrap">
         Enviar
       </button>
     </div>
@@ -45,7 +45,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       @for (simulado of simulados(); track simulado.id) {
       <button type="button" appTilt (click)="openExam(simulado.subject)"
-        class="text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60 h-full flex flex-col justify-between">
+        class="text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60 min-h-[140px] flex flex-col justify-between">
         <div>
           <h3 class="font-medium text-lg text-futuristic-text dark:text-dark-text mb-1">{{ simulado.subject }}</h3>
           <p class="text-futuristic-subtext dark:text-dark-subtext text-xs mb-3">Simulado de 30 questões.</p>
