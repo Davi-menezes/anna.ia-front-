@@ -5,8 +5,6 @@
     <p class="text-xl text-futuristic-subtext dark:text-dark-subtext">Sua assistente de estudos pessoal</p>
   </div>
 
-
-
   <!-- Chat -->
   <div
     class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-xl p-6 mb-8 border border-white/40 dark:border-slate-700/50">
@@ -21,20 +19,21 @@
       [ngClass]="hasStartedChat() ? 'h-[650px]' : 'h-[200px]'">
       @for (message of messages(); track $index) {
       <div [class]="message.role === 'user' ? 'text-right mb-4' : 'text-left mb-4'">
-        <div [class]="message.role === 'user' 
-            ? 'inline-block bg-futuristic-primary text-white px-4 py-2 rounded-lg rounded-tr-none' 
-            : 'inline-block bg-gray-100 dark:bg-slate-700 px-4 py-2 rounded-lg rounded-tl-none'">
+        <div
+          [class]="message.role === 'user' 
+            ? 'inline-block bg-futuristic-primary text-white px-4 py-2 rounded-lg rounded-tr-none max-w-[85%]' 
+            : 'inline-block bg-gray-100 dark:bg-slate-700 dark:text-gray-200 px-4 py-2 rounded-lg rounded-tl-none max-w-[85%]'">
           {{ message.content }}
         </div>
       </div>
       }
     </div>
-    <div class="flex gap-2">
+    <div class="flex flex-col sm:flex-row gap-2">
       <input type="text" [ngModel]="userInput()" (ngModelChange)="userInput.set($event)" (keyup.enter)="sendMessage()"
         placeholder="Digite sua pergunta..."
-        class="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-futuristic-primary focus:border-transparent dark:bg-slate-800 dark:text-white">
+        class="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-futuristic-primary focus:border-transparent dark:bg-slate-800 dark:text-white">
       <button (click)="sendMessage()"
-        class="px-6 py-2 bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors">
+        class="px-6 py-3 bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors font-medium sm:w-auto w-full">
         Enviar
       </button>
     </div>
@@ -46,9 +45,11 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       @for (simulado of simulados(); track simulado.id) {
       <button type="button" appTilt (click)="openExam(simulado.subject)"
-        class="text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60">
-        <h3 class="font-medium text-lg text-futuristic-text dark:text-dark-text mb-1">{{ simulado.subject }}</h3>
-        <p class="text-futuristic-subtext dark:text-dark-subtext text-xs mb-3">Simulado de 30 questões.</p>
+        class="text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60 h-full flex flex-col justify-between">
+        <div>
+          <h3 class="font-medium text-lg text-futuristic-text dark:text-dark-text mb-1">{{ simulado.subject }}</h3>
+          <p class="text-futuristic-subtext dark:text-dark-subtext text-xs mb-3">Simulado de 30 questões.</p>
+        </div>
         <div
           class="flex items-center gap-1.5 text-[10px] font-bold text-futuristic-primary/80 uppercase tracking-wider">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,8 +173,9 @@
 
 <!-- Modal de Simulado -->
 @if (selectedSubject()) {
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-  <div class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+  <div
+    class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-semibold text-futuristic-text dark:text-dark-text">
         {{ selectedSubject() }} <span class="text-sm font-normal text-gray-500">({{ currentQuestionIndex() + 1 }}/{{
@@ -199,7 +201,7 @@
         [class.border-futuristic-primary]="selectedAnswer() === null"
         [class.border-green-500]="selectedAnswer() === $index && $index === question.correctAnswerIndex"
         [class.border-red-500]="selectedAnswer() === $index && $index !== question.correctAnswerIndex && selectedAnswer() !== null"
-        class="w-full text-left p-3 border rounded-lg transition-colors disabled:opacity-90">
+        class="w-full text-left p-3 border rounded-lg transition-colors disabled:opacity-90 hover:bg-gray-50 dark:hover:bg-slate-700/50">
         {{ option }}
       </button>
       }
@@ -219,13 +221,12 @@
 
     <div class="flex justify-between mt-6">
       <button (click)="prevQuestion()" [disabled]="currentQuestionIndex() === 0"
-        class="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        class="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300">
         Anterior
       </button>
 
       <button (click)="nextQuestion()" [disabled]="currentQuestionIndex() === currentExamQuestions().length - 1"
-        class={`px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary
-        transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}>
+        class="px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
         Próxima
       </button>
     </div>
@@ -235,3 +236,4 @@
 }
 
 <app-credits-modal></app-credits-modal>
+<app-onboarding-modal [isOpen]="showOnboarding()" (completed)="onOnboardingCompleted()"></app-onboarding-modal>

@@ -17,14 +17,14 @@ export class GeminiService {
 
   constructor() { }
 
-  async generateResponse(prompt: string): Promise<string> {
+  async generateResponse(prompt: string, history: { role: string, content: string }[] = []): Promise<string> {
     this.loading.set(true);
     this.error.set(null);
     try {
       const response = await firstValueFrom(
         this.http.post<{ success: boolean, content: string, credits: number }>(
           `${this.apiUrl}/gemini/chat`,
-          { prompt }
+          { prompt, history }
         )
       );
 

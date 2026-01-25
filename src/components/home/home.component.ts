@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
@@ -12,19 +12,21 @@ import { GeminiService } from '../../services/gemini.service';
 import { UserService } from '../../services/user.service';
 import { CreditsModalComponent } from '../credits-modal/credits-modal.component';
 import { TiltDirective } from '../../directives/tilt.directive';
+import { OnboardingModalComponent } from '../onboarding-modal/onboarding-modal.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, CommonModule, CreditsModalComponent, RouterLink, TiltDirective]
+  imports: [FormsModule, CommonModule, CreditsModalComponent, RouterLink, TiltDirective, OnboardingModalComponent]
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   geminiService = inject(GeminiService);
   userService = inject(UserService);
 
   userInput = signal('');
+  // We will eventually move this to GeminiService, but for now let's keep it here or sync it
   messages = signal<ChatMessage[]>([]);
   hasStartedChat = computed(() => this.messages().length > 1); // > 1 because 1 is the greeting
 
@@ -37,6 +39,9 @@ export class HomeComponent {
   currentExamQuestions = signal<Simulado[]>([]);
   currentQuestionIndex = signal<number>(0);
   selectedAnswer = signal<number | null>(null);
+
+  // Onboarding State
+  showOnboarding = signal(false);
 
   vestibulares = signal<Vestibular[]>([
     {
@@ -68,8 +73,30 @@ export class HomeComponent {
   vestibularesPreview = computed(() => this.vestibulares().slice(0, 3));
 
   constructor(private router: Router) {
+    // Initial greeting moved to ngOnInit to avoid signal issues
+  }
+
+  ngOnInit() {
     this.setGreeting();
     this.refreshQuestions();
+    this.checkOnboarding();
+  }
+
+  checkOnboarding() {
+    // Use a small timeout to ensure user data is loaded if it's coming from local storage/auth
+    setTimeout(() => {
+      if (this.userService.isLoggedIn()) {
+        const u = this.userService.user();
+        if (u && (!u.mainGoal || !u.education || !u.birthDate)) {
+          this.showOnboarding.set(true);
+        }
+      }
+    }, 1000);
+  }
+
+  onOnboardingCompleted() {
+    this.showOnboarding.set(false);
+    // Maybe refresh user data?
   }
 
   setGreeting() {
@@ -79,19 +106,27 @@ export class HomeComponent {
     else if (hour >= 12 && hour < 18) timeGreeting = 'Boa tarde';
     else timeGreeting = 'Boa noite';
 
-    this.messages.set([
-      { role: 'model', content: `${timeGreeting}! Como está o processo de estudos?` }
-    ]);
+    if (this.messages().length === 0) {
+      this.messages.set([
+        { role: 'model', content: `${timeGreeting}! Como está o processo de estudos?` }
+      ]);
+    }
   }
 
   refreshQuestions() {
-    // Pick one random question from each subject for the dashboard cards
+    if (!this.allQuestions) return;
+
     const subjects = Object.keys(this.allQuestions);
-    const randomQuestions: Simulado[] = subjects.map((subject, index) => {
+    const randomQuestions: Simulado[] = [];
+
+    subjects.forEach((subject, index) => {
       const questions = this.allQuestions[subject];
-      const randomQ = questions[Math.floor(Math.random() * questions.length)];
-      return { id: index, ...randomQ };
+      if (questions && questions.length > 0) {
+        const randomQ = questions[Math.floor(Math.random() * questions.length)];
+        randomQuestions.push({ id: index, ...randomQ });
+      }
     });
+
     this.simulados.set(randomQuestions);
   }
 
@@ -110,7 +145,7 @@ export class HomeComponent {
     this.messages.update(msgs => [...msgs, { role: 'user', content: prompt }]);
     this.userInput.set('');
 
-    const response = await this.geminiService.generateResponse(prompt);
+    const response = await this.geminiService.generateResponse(prompt, this.messages());
     this.messages.update(msgs => [...msgs, { role: 'model', content: response }]);
   }
 
