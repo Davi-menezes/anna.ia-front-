@@ -6,10 +6,10 @@ import { UserService } from '../../services/user.service';
 import { User } from '../../services/auth.service';
 
 @Component({
-    selector: 'app-onboarding-modal',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-onboarding-modal',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
     @if (isOpen) {
       <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20">
@@ -75,39 +75,37 @@ import { User } from '../../services/auth.service';
   `
 })
 export class OnboardingModalComponent {
-    @Input() isOpen = false;
-    @Output() completed = new EventEmitter<void>();
+  @Input() isOpen = false;
+  @Output() completed = new EventEmitter<void>();
 
-    userService = inject(UserService);
-    isLoading = signal(false);
+  userService = inject(UserService);
+  isLoading = signal(false);
 
-    formData: Partial<User> = {
-        birthDate: '',
-        education: '',
-        location: '',
-        mainGoal: ''
-    };
+  formData: Partial<User> = {
+    birthDate: '',
+    education: '',
+    location: '',
+    mainGoal: ''
+  };
 
-    isValid(): boolean {
-        return !!(this.formData.birthDate && this.formData.education && this.formData.mainGoal);
+  isValid(): boolean {
+    return !!(this.formData.birthDate && this.formData.education && this.formData.mainGoal);
+  }
+
+  async save() {
+    if (!this.isValid()) return;
+
+    this.isLoading.set(true);
+
+    try {
+      // We assume user is already logged in if this modal is shown
+      await this.userService.updateProfile(this.formData);
+      this.isLoading.set(false);
+      this.completed.emit();
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      this.isLoading.set(false);
+      alert('Erro ao salvar as informações. Tente novamente.');
     }
-
-    save() {
-        if (!this.isValid()) return;
-
-        this.isLoading.set(true);
-
-        // We assume user is already logged in if this modal is shown
-        this.userService.updateProfile(this.formData).subscribe({
-            next: () => {
-                this.isLoading.set(false);
-                this.completed.emit();
-            },
-            error: (err) => {
-                console.error('Error saving profile:', err);
-                this.isLoading.set(false);
-                alert('Erro ao salvar as informações. Tente novamente.');
-            }
-        });
-    }
+  }
 }
