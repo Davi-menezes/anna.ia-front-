@@ -42,23 +42,22 @@
               <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 8.48L5.53 8 12 4.48 18.47 8 12 11.48z" />
             </svg>
           </a>
-          <a routerLink="/profile" class="flex flex-col items-center hover:scale-105 transition-transform duration-300">
-            <div class="h-10 w-10 rounded-full border-2 border-white dark:border-slate-700 overflow-hidden shadow-md">
-              <img [src]="userService.getProfilePictureUrl()" class="h-full w-full object-cover" alt="Perfil">
-            </div>
-            <!-- Mobile Credits Badge -->
-            <div class="sm:hidden flex flex-col items-center mt-1">
-              <div (click)="openCreditsModal(); $event.preventDefault(); $event.stopPropagation()"
-                class="flex items-center justify-center w-12 h-12 rounded-full bg-futuristic-primary text-white font-bold text-xs shadow-md cursor-pointer hover:bg-futuristic-secondary transition-colors">
-                @if (userService.isPremium()) {
-                <span class="text-lg">∞</span>
-                } @else {
-                <span>{{ userService.credits() | number:'1.0-1' }}</span>
-                }
+          <div class="flex items-center space-x-2">
+            <a routerLink="/profile" class="hover:scale-105 transition-transform duration-300">
+              <div class="h-10 w-10 rounded-full border-2 border-white dark:border-slate-700 overflow-hidden shadow-md">
+                <img [src]="userService.getProfilePictureUrl()" class="h-full w-full object-cover" alt="Perfil">
               </div>
-              <span class="text-[10px] text-futuristic-subtext dark:text-dark-subtext mt-0.5">créditos</span>
-            </div>
-          </a>
+            </a>
+            <!-- Mobile Credits Badge -->
+            <button (click)="openCreditsModal()"
+              class="sm:hidden px-3 py-1.5 rounded-full bg-futuristic-primary text-white text-xs font-bold shadow-md hover:bg-futuristic-secondary transition-colors whitespace-nowrap">
+              @if (userService.isPremium()) {
+              ∞ créditos
+              } @else {
+              {{ userService.credits() | number:'1.0-1' }} créditos
+              }
+            </button>
+          </div>
         </div>
         } @else {
         <a routerLink="/login" class="p-2 rounded-full hover:bg-white/20 dark:hover:bg-slate-700/50 transition-colors">
