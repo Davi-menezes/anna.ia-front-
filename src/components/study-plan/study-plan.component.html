@@ -166,21 +166,16 @@
                 <i class="fas fa-calendar-day text-futuristic-primary"></i> Cronograma Semanal
             </h3>
             <div class="flex flex-col items-end">
-                <button (click)="generateSchedule()" [disabled]="isLoading()"
-                    [class.animate-pulse]="needsRecalibration()" [class.ring-4]="needsRecalibration()"
-                    [class.ring-amber-500/50]="needsRecalibration()"
-                    class="group relative px-6 py-2 bg-white dark:bg-slate-800 text-sm font-black text-futuristic-primary rounded-xl border-2 border-futuristic-primary/20 hover:border-futuristic-primary transition-all flex items-center gap-2">
-                    <i class="fas fa-sync-alt" [class.fa-spin]="isLoading()"></i>
-                    Recalibrar Plano
-                    @if (needsRecalibration()) {
-                    <span
-                        class="absolute -top-12 right-0 bg-amber-500 text-white text-[10px] px-3 py-1 rounded-lg shadow-xl animate-bounce whitespace-nowrap">
-                        IA Sugere Ajuste! 🧠
-                    </span>
-                    }
-                </button>
+                <div
+                    class="bg-gradient-to-r from-futuristic-primary/10 to-futuristic-secondary/10 px-4 py-2 rounded-xl border border-futuristic-primary/20">
+                    <p class="text-xs text-futuristic-subtext dark:text-dark-subtext flex items-center gap-2">
+                        <i class="fas fa-sync-alt text-futuristic-primary"></i>
+                        <span>Atualizado automaticamente todo início de mês</span>
+                    </p>
+                </div>
             </div>
         </div>
+
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             @for (day of weeklySchedule()?.content?.days; track day.day) {

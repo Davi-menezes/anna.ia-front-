@@ -24,7 +24,6 @@ export class StudyPlanComponent {
 
     step = signal(1);
     isLoading = signal(false);
-    needsRecalibration = signal(false);
 
     // Onboarding Data
     setupData = {
@@ -106,14 +105,13 @@ export class StudyPlanComponent {
         }
     }
 
-    async generateSchedule() {
+    private async generateSchedule() {
         if (!this.activePlan()) return;
         this.isLoading.set(true);
         try {
             const schedule = await this.studyPlanService.generateWeekly(this.activePlan().id);
             this.weeklySchedule.set(schedule.data);
-            this.needsRecalibration.set(false);
-            this.notificationService.showSuccess('Cronograma recalibrado com base na sua evolução! 🧠');
+            this.notificationService.showSuccess('Plano de estudos gerado com sucesso! 🧠');
         } catch (error: any) {
             console.error('Error generating schedule:', error);
             this.notificationService.showError(error.message || 'Erro ao gerar cronograma semanal.');
@@ -127,15 +125,11 @@ export class StudyPlanComponent {
         try {
             await this.studyPlanService.updatePerformance(this.activePlan().id, subjectName, perf);
             const messages: any = {
-                'bad': 'Tudo bem recomeçar. Vou ajustar o foco para essa matéria na próxima semana! 💪',
+                'bad': 'Tudo bem recomeçar. Vou ajustar o foco para essa matéria no próximo mês! 💪',
                 'average': 'Bom progresso! Continue insistindo que vai ficar fácil. 🚀',
                 'good': 'Excelente! Você está dominando esse conteúdo. Orgulho! 🌟'
             };
             this.notificationService.showSuccess(messages[perf] || 'Feedback enviado!');
-
-            if (perf === 'bad') {
-                this.needsRecalibration.set(true);
-            }
         } catch (error) {
             this.notificationService.showError('Erro ao atualizar desempenho.');
         }
