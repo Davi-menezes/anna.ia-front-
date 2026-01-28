@@ -25,9 +25,8 @@
       <div class="flex justify-between items-center text-sm">
         <span class="font-medium text-futuristic-text dark:text-dark-text">Saldo Atual</span>
         <span class="font-bold text-futuristic-primary">
-          @if (userService.isPremium()) { ∞ }
-          @else { {{ userService.credits() | number:'1.0-2' }} / {{ userService.maxCredits | number:'1.0-2' }} créditos
-          }
+          @if (userService.isPremium()) { 500 / 500 créditos }
+          @else { {{ userService.credits() | number:'1.0-2' }} / {{ userService.maxCredits | number:'1.0-2' }} créditos }
         </span>
       </div>
       @if (!userService.isPremium()) {
@@ -58,14 +57,13 @@
           }
           <div class="flex-1 flex flex-col justify-between">
             <div>
-              <h3 class="text-sm sm:text-lg font-semibold text-futuristic-primary">{{ pkg.amount === 999 ? 'Créditos
-                Ilimitados' : (pkg.amount + ' Créditos') }}</h3>
+              <h3 class="text-sm sm:text-lg font-semibold text-futuristic-primary">{{ pkg.amount === 500 ? 'Plano Premium' : (pkg.amount + ' Créditos') }}</h3>
               <p class="mt-1 text-xs sm:text-sm text-futuristic-text dark:text-dark-text">{{ pkg.price }}</p>
             </div>
             <p class="mt-2 text-[10px] sm:text-xs text-futuristic-subtext dark:text-dark-subtext">{{ pkg.description }}
             </p>
           </div>
-          @if (pkg.amount === 999) {
+          @if (pkg.amount === 500) {
           <div class="absolute inset-0 -z-10 opacity-0 group-hover:opacity-100 transition-opacity">
             <div
               class="absolute inset-0 bg-gradient-to-br from-futuristic-secondary/5 to-futuristic-primary/5 rounded-xl">

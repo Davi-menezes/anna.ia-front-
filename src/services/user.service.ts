@@ -14,7 +14,9 @@ export class UserService {
   user = signal<any>(null);
   isPremium = computed(() => this.user()?.status === 'premium');
   credits = signal(5);
-  maxCredits = 5;
+  get maxCredits(): number {
+    return this.isPremium() ? 500 : 5;
+  }
   isOutOfCreditsModalOpen = signal(false);
   private apiUrl = environment.apiUrl;
 

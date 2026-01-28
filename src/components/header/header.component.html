@@ -31,7 +31,7 @@
           <button (click)="openCreditsModal()"
             class="hidden sm:block text-sm font-medium bg-white/60 dark:bg-slate-700/50 px-3 py-1.5 rounded-full backdrop-blur-sm text-futuristic-subtext dark:text-dark-subtext hover:bg-white/80 dark:hover:bg-slate-700 transition-colors">
             Créditos: <span class="font-bold text-futuristic-text dark:text-dark-text">
-              @if (userService.isPremium()) { ∞ }
+              @if (userService.isPremium()) { 500 }
               @else { {{ userService.credits() | number:'1.0-2' }} }
             </span>
           </button>
@@ -52,7 +52,7 @@
             <button (click)="openCreditsModal()"
               class="sm:hidden px-2.5 py-1 rounded-full bg-futuristic-primary text-white text-[11px] font-bold shadow-md hover:bg-futuristic-secondary transition-colors whitespace-nowrap">
               @if (userService.isPremium()) {
-              ∞
+              500
               } @else {
               {{ userService.credits() | number:'1.0-1' }}
               }
