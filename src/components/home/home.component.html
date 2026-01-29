@@ -181,8 +181,10 @@
     class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-semibold text-futuristic-text dark:text-dark-text">
-        {{ selectedSubject() }} <span class="text-sm font-normal text-gray-500">({{ currentQuestionIndex() + 1 }}/{{
-          currentExamQuestions().length }})</span>
+        {{ selectedSubject() }} 
+        @if(currentExamQuestions().length > 0) {
+          <span class="text-sm font-normal text-gray-500">({{ currentQuestionIndex() + 1 }}/{{ currentExamQuestions().length }})</span>
+        }
       </h3>
       <button (click)="closeExam()"
         class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
@@ -192,47 +194,57 @@
       </button>
     </div>
 
-    @if (currentQuestion; as question) {
-    <p class="mb-6 text-futuristic-subtext dark:text-dark-subtext font-medium text-lg">
-      {{ question.question }}
-    </p>
-
-    <div class="space-y-3 mb-6">
-      @for (option of question.options; track $index) {
-      <button (click)="submitAnswer($index)" [disabled]="selectedAnswer() !== null"
-        [class.bg-futuristic-primary]="selectedAnswer() === $index" [class.text-white]="selectedAnswer() === $index"
-        [class.border-futuristic-primary]="selectedAnswer() === null"
-        [class.border-green-500]="selectedAnswer() === $index && $index === question.correctAnswerIndex"
-        [class.border-red-500]="selectedAnswer() === $index && $index !== question.correctAnswerIndex && selectedAnswer() !== null"
-        class="w-full text-left p-3 border rounded-lg transition-colors disabled:opacity-90 hover:bg-gray-50 dark:hover:bg-slate-700/50">
-        {{ option }}
-      </button>
-      }
-    </div>
-
-    @if (selectedAnswer() !== null) {
-    <div class="p-4 rounded-lg mb-6" [class.bg-green-100]="selectedAnswer() === question.correctAnswerIndex"
-      [class.text-green-800]="selectedAnswer() === question.correctAnswerIndex"
-      [class.bg-red-100]="selectedAnswer() !== question.correctAnswerIndex"
-      [class.text-red-800]="selectedAnswer() !== question.correctAnswerIndex">
-      <p class="font-medium">
-        {{ selectedAnswer() === question.correctAnswerIndex ? "Resposta correta! 🎉" : "Resposta incorreta." }}
+    @if (isLoadingSimulado()) {
+      <div class="text-center py-10">
+        <p class="text-futuristic-subtext dark:text-dark-subtext">Gerando seu simulado com a IA... 🧠</p>
+      </div>
+    } @else if (simuladoError()) {
+      <div class="text-center py-10">
+        <p class="text-red-500 font-medium">Erro ao gerar simulado:</p>
+        <p class="text-futuristic-subtext dark:text-dark-subtext mt-2">{{ simuladoError() }}</p>
+        <button (click)="openExam(selectedSubject()!)" class="mt-4 px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors">Tentar Novamente</button>
+      </div>
+    } @else if (currentQuestion; as question) {
+      <p class="mb-6 text-futuristic-subtext dark:text-dark-subtext font-medium text-lg">
+        {{ question.question }}
       </p>
-      <p class="mt-2 text-sm">{{ question.explanation }}</p>
-    </div>
-    }
 
-    <div class="flex justify-between mt-6">
-      <button (click)="prevQuestion()" [disabled]="currentQuestionIndex() === 0"
-        class="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300">
-        Anterior
-      </button>
+      <div class="space-y-3 mb-6">
+        @for (option of question.options; track $index) {
+        <button (click)="submitAnswer($index)" [disabled]="selectedAnswer() !== null"
+          [class.bg-futuristic-primary]="selectedAnswer() === $index" [class.text-white]="selectedAnswer() === $index"
+          [class.border-futuristic-primary]="selectedAnswer() === null"
+          [class.border-green-500]="selectedAnswer() === $index && $index === question.correctAnswerIndex"
+          [class.border-red-500]="selectedAnswer() === $index && $index !== question.correctAnswerIndex && selectedAnswer() !== null"
+          class="w-full text-left p-3 border rounded-lg transition-colors disabled:opacity-90 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+          {{ option }}
+        </button>
+        }
+      </div>
 
-      <button (click)="nextQuestion()" [disabled]="currentQuestionIndex() === currentExamQuestions().length - 1"
-        class="px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-        Próxima
-      </button>
-    </div>
+      @if (selectedAnswer() !== null) {
+      <div class="p-4 rounded-lg mb-6" [class.bg-green-100]="selectedAnswer() === question.correctAnswerIndex"
+        [class.text-green-800]="selectedAnswer() === question.correctAnswerIndex"
+        [class.bg-red-100]="selectedAnswer() !== question.correctAnswerIndex"
+        [class.text-red-800]="selectedAnswer() !== question.correctAnswerIndex">
+        <p class="font-medium">
+          {{ selectedAnswer() === question.correctAnswerIndex ? "Resposta correta! 🎉" : "Resposta incorreta." }}
+        </p>
+        <p class="mt-2 text-sm">{{ question.explanation }}</p>
+      </div>
+      }
+
+      <div class="flex justify-between mt-6">
+        <button (click)="prevQuestion()" [disabled]="currentQuestionIndex() === 0"
+          class="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300">
+          Anterior
+        </button>
+
+        <button (click)="nextQuestion()" [disabled]="currentQuestionIndex() === currentExamQuestions().length - 1"
+          class="px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Próxima
+        </button>
+      </div>
     }
   </div>
 </div>

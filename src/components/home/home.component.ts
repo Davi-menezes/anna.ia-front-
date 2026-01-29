@@ -10,6 +10,7 @@ import { QUESTIONS_POOL } from '../../models/questions.data';
 import { Vestibular } from '../../models/vestibular.model';
 import { GeminiService } from '../../services/gemini.service';
 import { UserService } from '../../services/user.service';
+import { StudyPlanService } from '../../services/study-plan.service'; // Import StudyPlanService
 import { CreditsModalComponent } from '../credits-modal/credits-modal.component';
 import { TiltDirective } from '../../directives/tilt.directive';
 import { OnboardingModalComponent } from '../onboarding-modal/onboarding-modal.component';
@@ -24,13 +25,12 @@ import { OnboardingModalComponent } from '../onboarding-modal/onboarding-modal.c
 export class HomeComponent implements OnInit {
   geminiService = inject(GeminiService);
   userService = inject(UserService);
+  studyPlanService = inject(StudyPlanService); // Inject StudyPlanService
 
   userInput = signal('');
-  // We will eventually move this to GeminiService, but for now let's keep it here or sync it
   messages = signal<ChatMessage[]>([]);
-  hasStartedChat = computed(() => this.messages().length > 1); // > 1 because 1 is the greeting
+  hasStartedChat = computed(() => this.messages().length > 1);
 
-  // Use a map or object to store the pool, and a signal for the *current* display list
   allQuestions = QUESTIONS_POOL;
   simulados = signal<Simulado[]>([]);
 
@@ -39,6 +39,8 @@ export class HomeComponent implements OnInit {
   currentExamQuestions = signal<Simulado[]>([]);
   currentQuestionIndex = signal<number>(0);
   selectedAnswer = signal<number | null>(null);
+  isLoadingSimulado = signal(false); // Loading state for simulado
+  simuladoError = signal<string | null>(null);
 
   // Onboarding State
   showOnboarding = signal(false);
@@ -96,7 +98,6 @@ export class HomeComponent implements OnInit {
 
   onOnboardingCompleted() {
     this.showOnboarding.set(false);
-    // Maybe refresh user data?
   }
 
   setGreeting() {
@@ -139,9 +140,6 @@ export class HomeComponent implements OnInit {
     const prompt = this.userInput().trim();
     if (!prompt) return;
 
-    // Credit deduction is now handled by the backend in GeminiService.
-    // We update the local message list immediately for better UX.
-
     this.messages.update(msgs => [...msgs, { role: 'user', content: prompt }]);
     this.userInput.set('');
 
@@ -149,28 +147,33 @@ export class HomeComponent implements OnInit {
     this.messages.update(msgs => [...msgs, { role: 'model', content: response }]);
   }
 
-  openExam(subject: string) {
+  async openExam(subject: string) {
     if (!this.userService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
-
-    if (this.userService.credits() < 0.3) {
+    
+    // The credit check per answer is handled in submitAnswer, but we can keep a general check
+    if (this.userService.credits() < 0.3) { 
       this.userService.isOutOfCreditsModalOpen.set(true);
       return;
     }
+
     this.selectedSubject.set(subject);
+    this.isLoadingSimulado.set(true);
+    this.simuladoError.set(null);
+    this.currentExamQuestions.set([]);
 
-    // Load questions for this subject and shuffle them
-    const questions = [...(this.allQuestions[subject] || [])];
-    this.shuffleArray(questions);
-
-    // Map to Simulado type (add IDs)
-    const examQuestions: Simulado[] = questions.map((q, i) => ({ id: i, ...q }));
-
-    this.currentExamQuestions.set(examQuestions);
-    this.currentQuestionIndex.set(0);
-    this.selectedAnswer.set(null);
+    try {
+      const questions = await this.studyPlanService.generateSimulado(subject);
+      this.currentExamQuestions.set(questions);
+      this.currentQuestionIndex.set(0);
+      this.selectedAnswer.set(null);
+    } catch (error: any) {
+      this.simuladoError.set(error.message || 'Erro desconhecido ao gerar o simulado.');
+    } finally {
+      this.isLoadingSimulado.set(false);
+    }
   }
 
   closeExam() {
@@ -178,12 +181,13 @@ export class HomeComponent implements OnInit {
     this.currentExamQuestions.set([]);
     this.currentQuestionIndex.set(0);
     this.selectedAnswer.set(null);
+    this.isLoadingSimulado.set(false);
+    this.simuladoError.set(null);
   }
 
   async submitAnswer(optionIndex: number) {
     if (this.selectedAnswer() !== null) return;
 
-    // Deduct 0.3 credits for each simulation answer
     const success = await this.userService.deductCredits(0.3);
     if (!success) {
       return;
@@ -204,14 +208,6 @@ export class HomeComponent implements OnInit {
     const current = this.currentQuestionIndex();
     if (current > 0) {
       this.currentQuestionIndex.set(current - 1);
-      // We might want to save state if they go back, but simple version resets or keeps?
-      // For simplicity, let's reset answer state when moving or we need an array of answers.
-      // Current requirement: "mudar as questões todas as vezes que reinicia o site" -> implied persistent session not strict.
-      // Let's reset for now to allow re-trying or just simple navigation.
-      // Better ux: keep answers? That requires an array of user answers. 
-      // Let's stick to simple: next/prev resets state for that question view if not implemented fully.
-      // Actually, standard quiz: once answered, stay answered.
-      // I will reset for simplicity as user just asked for "30 questions modal", not full quiz state engine.
       this.selectedAnswer.set(null);
     }
   }

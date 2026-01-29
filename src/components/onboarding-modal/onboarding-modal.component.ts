@@ -24,8 +24,11 @@ import { User } from '../../services/auth.service';
                 <!-- Data de Nascimento -->
                 <div>
                   <label class="block font-medium text-futuristic-subtext dark:text-dark-subtext mb-2">Data de Nascimento</label>
-                  <input type="date" [(ngModel)]="formData.birthDate" 
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-futuristic-primary outline-none transition-all">
+                  <div class="grid grid-cols-3 gap-2">
+                    <input type="number" placeholder="DD" [(ngModel)]="day" min="1" max="31" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-futuristic-primary outline-none transition-all">
+                    <input type="number" placeholder="MM" [(ngModel)]="month" min="1" max="12" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-futuristic-primary outline-none transition-all">
+                    <input type="text" placeholder="YYYY" [(ngModel)]="year" (input)="limitYear($event)" inputmode="numeric" pattern="\\d{4}" maxlength="4" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-futuristic-primary outline-none transition-all">
+                  </div>
                 </div>
 
                 <!-- Escolaridade -->
@@ -81,15 +84,26 @@ export class OnboardingModalComponent {
   userService = inject(UserService);
   isLoading = signal(false);
 
+  day: number | null = null;
+  month: number | null = null;
+  year: number | null = null; // stores 4-digit year
+
   formData: Partial<User> = {
-    birthDate: '',
     education: '',
     location: '',
     mainGoal: ''
   };
 
+  limitYear(event: Event) {
+    const input = event.target as HTMLInputElement;
+    // keep only digits and limit to 4 chars
+    input.value = (input.value || '').replace(/[^0-9]/g, '').slice(0, 4);
+    this.year = input.value ? Number(input.value) : null;
+  }
+
   isValid(): boolean {
-    return !!(this.formData.birthDate && this.formData.education && this.formData.mainGoal);
+    const isDateValid = this.year && this.month && this.day && this.year > 1920 && this.year <= new Date().getFullYear() && this.month > 0 && this.month <= 12 && this.day > 0 && this.day <= 31;
+    return !!(isDateValid && this.formData.education && this.formData.mainGoal);
   }
 
   async save() {
@@ -97,9 +111,14 @@ export class OnboardingModalComponent {
 
     this.isLoading.set(true);
 
+    const month = this.month!.toString().padStart(2, '0');
+    const day = this.day!.toString().padStart(2, '0');
+    const birthDate = `${this.year}-${month}-${day}`;
+
+    const dataToSave = { ...this.formData, birthDate };
+
     try {
-      // We assume user is already logged in if this modal is shown
-      await this.userService.updateProfile(this.formData);
+      await this.userService.updateProfile(dataToSave);
       this.isLoading.set(false);
       this.completed.emit();
     } catch (err) {
