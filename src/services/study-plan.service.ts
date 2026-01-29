@@ -34,7 +34,7 @@ export class StudyPlanService {
     return await lastValueFrom(this.http.post<{ success: boolean; data: any }>(`${this.apiUrl}/${planId}/generate`, {}, { headers }));
   }
 
-  async updatePerformance(planId: string, subjectName: string, performance: 'good' | 'average' | 'bad'): Promise<{ success: boolean }>{
+  async updatePerformance(planId: string, subjectName: string, performance: string): Promise<{ success: boolean }>{
     const token = this.authService.getToken();
     if (!token) throw new Error('Não autenticado');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
