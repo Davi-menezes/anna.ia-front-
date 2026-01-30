@@ -45,7 +45,6 @@ export class UserService {
   }
 
   async deductCredits(amount: number): Promise<boolean> {
-    if (this.isPremium()) return true;
     try {
       const response = await firstValueFrom(
         this.http.post<{ success: boolean, credits: number }>(

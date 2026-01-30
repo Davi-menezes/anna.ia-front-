@@ -153,8 +153,8 @@ export class HomeComponent implements OnInit {
       return;
     }
     
-    // The credit check per answer is handled in submitAnswer, but we can keep a general check
-    if (this.userService.credits() < 0.3) { 
+    // Backend charges the full simulado cost on generation (30 x 0.3 = 9 credits)
+    if (this.userService.credits() < 9) { 
       this.userService.isOutOfCreditsModalOpen.set(true);
       return;
     }
@@ -187,11 +187,6 @@ export class HomeComponent implements OnInit {
 
   async submitAnswer(optionIndex: number) {
     if (this.selectedAnswer() !== null) return;
-
-    const success = await this.userService.deductCredits(0.3);
-    if (!success) {
-      return;
-    }
 
     this.selectedAnswer.set(optionIndex);
   }
