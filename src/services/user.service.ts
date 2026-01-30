@@ -30,7 +30,8 @@ export class UserService {
       this.isLoggedIn.set(!!user);
       this.user.set(user);
       if (user) {
-        this.credits.set(user.credits);
+        const n = typeof (user as any).credits === 'number' ? (user as any).credits : Number((user as any).credits);
+        this.credits.set(Number.isFinite(n) ? n : 5);
       }
     });
   }

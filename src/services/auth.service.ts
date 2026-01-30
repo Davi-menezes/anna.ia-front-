@@ -41,6 +41,12 @@ export class AuthService {
 
   redirectUrl: string | null = null;
 
+  private normalizeCredits(value: any): number {
+    const n = typeof value === 'number' ? value : Number(value);
+    if (Number.isFinite(n)) return n;
+    return 5;
+  }
+
   constructor() {
     this.initialCheck();
   }
@@ -96,7 +102,7 @@ export class AuthService {
         }
 
         this.setToken(response.token);
-        const userWithCredits = { ...response.user, credits: response.user.credits || 5 };
+        const userWithCredits = { ...response.user, credits: this.normalizeCredits(response.user.credits) };
         this.currentUserSubject.next(userWithCredits);
 
         if (this.redirectUrl) {
@@ -174,7 +180,7 @@ export class AuthService {
     return this.http.get<{ success: boolean, user: User }>(`${this.apiUrl}/auth/me`).pipe(
       map(response => {
         if (!response.success || !response.user) throw new Error('Falha ao buscar usuário');
-        const user = { ...response.user, credits: response.user.credits || 5 };
+        const user = { ...response.user, credits: this.normalizeCredits(response.user.credits) };
         this.currentUserSubject.next(user);
         return user;
       }),
