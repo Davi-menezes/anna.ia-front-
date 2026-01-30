@@ -152,12 +152,8 @@ export class HomeComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    
-    // Backend charges the full simulado cost on generation (30 x 0.3 = 9 credits)
-    if (this.userService.credits() < 9) { 
-      this.userService.isOutOfCreditsModalOpen.set(true);
-      return;
-    }
+
+    // Backend enforces credits and also allows 1 free trial simulado per user.
 
     this.selectedSubject.set(subject);
     this.isLoadingSimulado.set(true);
@@ -170,7 +166,12 @@ export class HomeComponent implements OnInit {
       this.currentQuestionIndex.set(0);
       this.selectedAnswer.set(null);
     } catch (error: any) {
-      this.simuladoError.set(error.message || 'Erro desconhecido ao gerar o simulado.');
+      if (error?.status === 403 || error?.error?.code === 'OUT_OF_CREDITS') {
+        this.userService.isOutOfCreditsModalOpen.set(true);
+        this.simuladoError.set('Créditos insuficientes para gerar simulado.');
+      } else {
+        this.simuladoError.set(error.message || 'Erro desconhecido ao gerar o simulado.');
+      }
     } finally {
       this.isLoadingSimulado.set(false);
     }

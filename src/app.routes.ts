@@ -13,6 +13,8 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { TermsComponent } from './components/terms/terms.component';
 import { AuthCallbackComponent } from './components/auth-callback/auth-callback.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { FlashcardsComponent } from './components/flashcards/flashcards.component';
+import { QuestionGoalsComponent } from './components/question-goals/question-goals.component';
 import { authGuard } from './guards/auth.guard';
 
 export const APP_ROUTES: Routes = [
@@ -70,6 +72,18 @@ export const APP_ROUTES: Routes = [
     path: 'study-plan',
     component: StudyPlanComponent,
     title: 'Anna.IA - Meu Plano de Estudos',
+    canActivate: [authGuard]
+  },
+  {
+    path: 'flashcards',
+    component: FlashcardsComponent,
+    title: 'Anna.IA - Flashcards',
+    canActivate: [authGuard]
+  },
+  {
+    path: 'question-goals',
+    component: QuestionGoalsComponent,
+    title: 'Anna.IA - Meta de Questões',
     canActivate: [authGuard]
   },
   { path: '**', redirectTo: '', pathMatch: 'full' }
