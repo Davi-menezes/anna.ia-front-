@@ -4,6 +4,7 @@ import { lastValueFrom } from 'rxjs';
 import { Simulado } from '../models/simulado.model';
 import { environment } from '../environments/environment';
 import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import { AuthService } from './auth.service';
 export class StudyPlanService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private userService = inject(UserService);
   private apiUrl = `${environment.apiUrl}/study-plans`;
 
   async getActivePlan(): Promise<{ success: boolean; data: any }> {
@@ -55,8 +57,9 @@ export class StudyPlanService {
         this.http.get<{ success: boolean, data: Simulado[], credits?: number }>(`${this.apiUrl}/simulado/${subject}`, { headers })
       );
       if (response.success) {
-        // If backend returns updated credits, let UserService reflect it via AuthService current user
-        // intentionally not mutating auth state here; credits can be refreshed via /auth/me
+        if (typeof response.credits === 'number') {
+          this.userService.credits.set(response.credits);
+        }
         return response.data;
       } else {
         throw new Error('Falha ao gerar simulado.');
