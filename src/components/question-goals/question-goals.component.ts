@@ -32,6 +32,12 @@ export class QuestionGoalsComponent {
     return Math.min((g.completedQuestions / g.targetQuestions) * 100, 100);
   });
 
+  progressText = computed(() => {
+    const g = this.goal();
+    if (!g) return '0/0';
+    return `${g.completedQuestions}/${g.targetQuestions}`;
+  });
+
   constructor() {
     this.refresh();
   }
