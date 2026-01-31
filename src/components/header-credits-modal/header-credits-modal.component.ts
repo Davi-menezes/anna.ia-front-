@@ -33,10 +33,10 @@ export class HeaderCreditsModalComponent {
   });
 
   packages: CreditPackage[] = [
-    { amount: 10, price: 'R$ 7,90', description: 'Para começar.' },
-    { amount: 50, price: 'R$ 19,90', description: 'Melhor custo-benefício.', popular: true },
-    { amount: 150, price: 'R$ 39,90', description: 'Para estudantes dedicados.' },
-    { amount: 500, price: 'R$ 59,90', description: 'Plano Premium: 500 créditos/mês + Plano de Estudos.' },
+    { amount: 20, price: 'R$ 9,90', description: '1 simulado + chat' },
+    { amount: 60, price: 'R$ 29,90', description: '5 simulados', popular: true },
+    { amount: 120, price: 'R$ 49,90', description: '10 simulados' },
+    { amount: 500, price: 'R$ 99,90', description: 'Plano Premium: 500 créditos/mês' },
   ];
 
   constructor(private router: Router) {}
