@@ -42,7 +42,8 @@ interface FlashcardRequest {
                   <div>
                     <label class="text-xs text-gray-600 dark:text-gray-400">Matéria</label>
                     <input 
-                      [(ngModel)]="flashcardRequests()[i]?.subject || ''" 
+                      [ngModel]="getFlashcardSubject(i)" 
+                      (ngModelChange)="setFlashcardSubject(i, $event)" 
                       placeholder="Ex: Matemática"
                       class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
                     />
@@ -50,7 +51,8 @@ interface FlashcardRequest {
                   <div>
                     <label class="text-xs text-gray-600 dark:text-gray-400">Tópico específico (opcional)</label>
                     <input 
-                      [(ngModel)]="flashcardRequests()[i]?.front || ''" 
+                      [ngModel]="getFlashcardFront(i)" 
+                      (ngModelChange)="setFlashcardFront(i, $event)" 
                       placeholder="Ex: Cálculo integral"
                       class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
                     />
@@ -147,6 +149,35 @@ export class FlashcardsModalComponent {
 
   hasValidSubjects(): boolean {
     return this.flashcardRequests().some(req => req.subject.trim().length > 0);
+  }
+
+  // Métodos para acesso seguro aos flashcards no template
+  getFlashcardSubject(index: number): string {
+    const requests = this.flashcardRequests();
+    return requests[index]?.subject || '';
+  }
+
+  setFlashcardSubject(index: number, value: string): void {
+    const requests = this.flashcardRequests();
+    if (!requests[index]) {
+      requests[index] = { subject: '', front: '' };
+    }
+    requests[index].subject = value;
+    this.flashcardRequests.set([...requests]);
+  }
+
+  getFlashcardFront(index: number): string {
+    const requests = this.flashcardRequests();
+    return requests[index]?.front || '';
+  }
+
+  setFlashcardFront(index: number, value: string): void {
+    const requests = this.flashcardRequests();
+    if (!requests[index]) {
+      requests[index] = { subject: '', front: '' };
+    }
+    requests[index].front = value;
+    this.flashcardRequests.set([...requests]);
   }
 
   closeModal() {
