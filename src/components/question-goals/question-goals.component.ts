@@ -188,6 +188,11 @@ export class QuestionGoalsComponent {
     );
     this.studyGoals.set(updatedGoals);
     this.saveStudyGoals();
+
+    // Se a meta foi marcada como concluída, adicionar 1 ao progresso de questões
+    if (!goal.completed) {
+      this.addProgress(1);
+    }
   }
 
   deleteGoal(goalId: string) {
