@@ -32,7 +32,7 @@ interface FlashcardRequest {
           </div>
 
           <div class="space-y-4">
-            @for (i of Array(10).keys(); track i) {
+            @for (i of flashcardIndices; track i) {
               <div class="p-4 border border-gray-200 dark:border-slate-700 rounded-lg">
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-sm font-semibold text-futuristic-primary">Flashcard {{ i + 1 }}</span>
@@ -122,6 +122,8 @@ export class FlashcardsModalComponent {
   flashcardRequests = signal<FlashcardRequest[]>(
     Array.from({ length: 10 }, () => ({ subject: '', front: '' }))
   );
+
+  flashcardIndices = Array.from({ length: 10 }, (_, i) => i);
 
   constructor() {
     this.loadUserCredits();
