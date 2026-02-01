@@ -18,8 +18,10 @@ export class FlashcardsComponent {
   private authService = inject(AuthService);
 
   apiUrl = `${environment.apiUrl}/flashcards`;
+  enhancedApiUrl = `${environment.apiUrl}/flashcards-enhanced`;
 
   isLoading = signal(false);
+  isGenerating = signal(false);
   error = signal<string | null>(null);
 
   subjectFilter = signal<string>('');
@@ -58,6 +60,38 @@ export class FlashcardsComponent {
       this.error.set('Erro ao carregar flashcards.');
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  async generateWithAI() {
+    this.isGenerating.set(true);
+    this.error.set(null);
+    
+    try {
+      const subjectForGeneration = this.subject().trim() || 'Geral';
+      
+      const res = await lastValueFrom(
+        this.http.post<{ success: boolean; data: any }>(
+          `${this.enhancedApiUrl}/generate`,
+          { subject: subjectForGeneration, count: 10 },
+          { headers: this.headers() }
+        )
+      );
+
+      if (res.success && res.data.flashcards) {
+        // Adicionar os novos flashcards à lista
+        this.flashcards.set([...this.flashcards(), ...res.data.flashcards]);
+        this.error.set(null);
+        
+        // Limpar formulário
+        this.cancelEdit();
+      } else {
+        this.error.set('Erro ao gerar flashcards com IA.');
+      }
+    } catch (e: any) {
+      this.error.set(e.error?.message || 'Erro ao gerar flashcards com IA.');
+    } finally {
+      this.isGenerating.set(false);
     }
   }
 

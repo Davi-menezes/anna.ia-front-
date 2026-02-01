@@ -7,6 +7,14 @@ import { environment } from '../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 import { QuestionGoal } from '../../models/question-goal.model';
 
+interface StudyGoal {
+  id: string;
+  title: string;
+  description?: string;
+  completed: boolean;
+  createdAt: Date;
+}
+
 @Component({
   selector: 'app-question-goals',
   standalone: true,
@@ -18,12 +26,19 @@ export class QuestionGoalsComponent {
   private authService = inject(AuthService);
 
   apiUrl = `${environment.apiUrl}/question-goals`;
+  studyGoalsApiUrl = `${environment.apiUrl}/study-goals`;
 
   isLoading = signal(false);
   error = signal<string | null>(null);
 
   goal = signal<QuestionGoal | null>(null);
   targetInput = signal<number>(0);
+  
+  // Para o TODO List de Metas de Estudo
+  studyGoals = signal<StudyGoal[]>([]);
+  newGoalTitle = signal('');
+  newGoalDescription = signal('');
+  editingGoalId = signal<string | null>(null);
 
   progressPct = computed(() => {
     const g = this.goal();
@@ -40,6 +55,7 @@ export class QuestionGoalsComponent {
 
   constructor() {
     this.refresh();
+    this.loadStudyGoals();
   }
 
   private headers(): HttpHeaders {
@@ -60,6 +76,26 @@ export class QuestionGoalsComponent {
       this.error.set('Erro ao carregar meta do dia.');
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  async loadStudyGoals() {
+    try {
+      // Simular carregamento de metas de estudo (implementação local)
+      const storedGoals = localStorage.getItem('studyGoals');
+      if (storedGoals) {
+        this.studyGoals.set(JSON.parse(storedGoals));
+      }
+    } catch (e: any) {
+      console.error('Erro ao carregar metas de estudo:', e);
+    }
+  }
+
+  async saveStudyGoals() {
+    try {
+      localStorage.setItem('studyGoals', JSON.stringify(this.studyGoals()));
+    } catch (e: any) {
+      console.error('Erro ao salvar metas de estudo:', e);
     }
   }
 
@@ -92,5 +128,71 @@ export class QuestionGoalsComponent {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  // Métodos para o TODO List de Metas de Estudo
+  addNewGoal() {
+    const title = this.newGoalTitle().trim();
+    if (!title) return;
+
+    const newGoal: StudyGoal = {
+      id: Date.now().toString(),
+      title,
+      description: this.newGoalDescription().trim() || undefined,
+      completed: false,
+      createdAt: new Date()
+    };
+
+    this.studyGoals.set([...this.studyGoals(), newGoal]);
+    this.saveStudyGoals();
+    
+    // Limpar formulário
+    this.newGoalTitle.set('');
+    this.newGoalDescription.set('');
+  }
+
+  editGoal(goal: StudyGoal) {
+    this.editingGoalId.set(goal.id);
+    this.newGoalTitle.set(goal.title);
+    this.newGoalDescription.set(goal.description || '');
+  }
+
+  async updateGoal(goal: StudyGoal) {
+    if (this.editingGoalId() === goal.id) {
+      // Salvar edição
+      const updatedGoals = this.studyGoals().map(g => 
+        g.id === goal.id 
+          ? { ...g, title: this.newGoalTitle(), description: this.newGoalDescription() || undefined }
+          : g
+      );
+      this.studyGoals.set(updatedGoals);
+      this.saveStudyGoals();
+      
+      // Limpar edição
+      this.editingGoalId.set(null);
+      this.newGoalTitle.set('');
+      this.newGoalDescription.set('');
+    } else {
+      // Toggle completion
+      const updatedGoals = this.studyGoals().map(g => 
+        g.id === goal.id ? { ...g, completed: !g.completed } : g
+      );
+      this.studyGoals.set(updatedGoals);
+      this.saveStudyGoals();
+    }
+  }
+
+  updateGoalStatus(goal: StudyGoal) {
+    const updatedGoals = this.studyGoals().map(g => 
+      g.id === goal.id ? { ...g, completed: !g.completed } : g
+    );
+    this.studyGoals.set(updatedGoals);
+    this.saveStudyGoals();
+  }
+
+  deleteGoal(goalId: string) {
+    const updatedGoals = this.studyGoals().filter(g => g.id !== goalId);
+    this.studyGoals.set(updatedGoals);
+    this.saveStudyGoals();
   }
 }
