@@ -18,6 +18,9 @@
             },
             "browser": "index.tsx",
             "tsConfig": "tsconfig.json",
+            "assets": [
+              "src/assets"
+            ],
             "styles": [
               "src/styles.css"
             ]

@@ -120,7 +120,7 @@ export class QuestionGoalsComponent {
     this.error.set(null);
     try {
       const res = await lastValueFrom(
-        this.http.post<{ success: boolean; data: QuestionGoal }>(`${this.apiUrl}/today/progress`, { amount }, { headers: this.headers() })
+        this.http.put<{ success: boolean; data: QuestionGoal }>(`${this.apiUrl}/today`, { amount }, { headers: this.headers() })
       );
       this.goal.set(res.data);
     } catch (e: any) {

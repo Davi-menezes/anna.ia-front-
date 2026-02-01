@@ -42,7 +42,7 @@ interface FlashcardRequest {
                   <div>
                     <label class="text-xs text-gray-600 dark:text-gray-400">Matéria</label>
                     <input 
-                      [(ngModel)]="flashcardRequests[i-1].subject" 
+                      [(ngModel)]="flashcardRequests()[i]?.subject || ''" 
                       placeholder="Ex: Matemática"
                       class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
                     />
@@ -50,7 +50,7 @@ interface FlashcardRequest {
                   <div>
                     <label class="text-xs text-gray-600 dark:text-gray-400">Tópico específico (opcional)</label>
                     <input 
-                      [(ngModel)]="flashcardRequests[i-1].front" 
+                      [(ngModel)]="flashcardRequests()[i]?.front || ''" 
                       placeholder="Ex: Cálculo integral"
                       class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
                     />
