@@ -6,11 +6,12 @@ import { lastValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 import { Flashcard } from '../../models/flashcard.model';
+import { FlashcardsModalComponent } from './flashcards-modal.component';
 
 @Component({
   selector: 'app-flashcards',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FlashcardsModalComponent],
   templateUrl: './flashcards.component.html',
 })
 export class FlashcardsComponent {
@@ -23,6 +24,7 @@ export class FlashcardsComponent {
   isLoading = signal(false);
   isGenerating = signal(false);
   error = signal<string | null>(null);
+  showModal = signal(false);
 
   subjectFilter = signal<string>('');
   flashcards = signal<Flashcard[]>([]);
@@ -41,11 +43,28 @@ export class FlashcardsComponent {
 
   constructor() {
     this.refresh();
+    this.setupEventListeners();
   }
 
   private headers(): HttpHeaders {
     const token = this.authService.getToken();
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  }
+
+  private setupEventListeners() {
+    // Escutar eventos do modal
+    window.addEventListener('closeFlashcardsModal', () => {
+      this.showModal.set(false);
+    });
+
+    window.addEventListener('flashcardsGenerated', (event: any) => {
+      const { flashcards } = event.detail;
+      this.flashcards.set([...this.flashcards(), ...flashcards]);
+    });
+  }
+
+  openModal() {
+    this.showModal.set(true);
   }
 
   async refresh() {
@@ -60,38 +79,6 @@ export class FlashcardsComponent {
       this.error.set('Erro ao carregar flashcards.');
     } finally {
       this.isLoading.set(false);
-    }
-  }
-
-  async generateWithAI() {
-    this.isGenerating.set(true);
-    this.error.set(null);
-    
-    try {
-      const subjectForGeneration = this.subject().trim() || 'Geral';
-      
-      const res = await lastValueFrom(
-        this.http.post<{ success: boolean; data: any }>(
-          `${this.enhancedApiUrl}/generate`,
-          { subject: subjectForGeneration, count: 10 },
-          { headers: this.headers() }
-        )
-      );
-
-      if (res.success && res.data.flashcards) {
-        // Adicionar os novos flashcards à lista
-        this.flashcards.set([...this.flashcards(), ...res.data.flashcards]);
-        this.error.set(null);
-        
-        // Limpar formulário
-        this.cancelEdit();
-      } else {
-        this.error.set('Erro ao gerar flashcards com IA.');
-      }
-    } catch (e: any) {
-      this.error.set(e.error?.message || 'Erro ao gerar flashcards com IA.');
-    } finally {
-      this.isGenerating.set(false);
     }
   }
 
