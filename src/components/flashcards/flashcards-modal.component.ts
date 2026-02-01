@@ -32,10 +32,10 @@ interface FlashcardRequest {
           </div>
 
           <div class="space-y-4">
-            @for (i of 10; track i) {
+            @for (i of Array(10).keys(); track i) {
               <div class="p-4 border border-gray-200 dark:border-slate-700 rounded-lg">
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="text-sm font-semibold text-futuristic-primary">Flashcard {{ i }}</span>
+                  <span class="text-sm font-semibold text-futuristic-primary">Flashcard {{ i + 1 }}</span>
                   <span class="text-xs text-gray-500">(opcional)</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -202,7 +202,7 @@ export class FlashcardsModalComponent {
 
       if (allGeneratedFlashcards.length > 0) {
         this.success.set(`${allGeneratedFlashcards.length} flashcards gerados com sucesso!`);
-        this.creditsRemaining.set(prev => prev - 0.5);
+        this.creditsRemaining.set(this.creditsRemaining() - 0.5);
         
         // Emitir evento com os flashcards gerados
         const event = new CustomEvent('flashcardsGenerated', { 
