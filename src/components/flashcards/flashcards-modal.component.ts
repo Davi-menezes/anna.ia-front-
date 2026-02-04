@@ -139,9 +139,9 @@ export class FlashcardsModalComponent {
   async loadUserCredits() {
     try {
       const res = await lastValueFrom(
-        this.http.get<{ success: boolean; data: any }>(`${environment.apiUrl}/users/profile`, { headers: this.headers() })
+        this.http.get<{ success: boolean; data: any }>(`${environment.apiUrl}/user/profile`, { headers: this.headers() })
       );
-      this.creditsRemaining.set(res.data.credits || 0);
+      this.creditsRemaining.set(res.data.user?.credits || 0);
     } catch (e) {
       console.error('Erro ao carregar créditos:', e);
     }
