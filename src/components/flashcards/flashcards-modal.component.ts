@@ -141,6 +141,8 @@ export class FlashcardsModalComponent {
       const res = await lastValueFrom(
         this.http.get<{ success: boolean; data: any }>(`${environment.apiUrl}/user/profile`, { headers: this.headers() })
       );
+      console.log('Resposta do backend:', res);
+      console.log('Créditos encontrados:', res.data.user?.credits);
       this.creditsRemaining.set(res.data.user?.credits || 0);
     } catch (e) {
       console.error('Erro ao carregar créditos:', e);

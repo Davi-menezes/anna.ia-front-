@@ -52,6 +52,7 @@ export class QuestionGoalsComponent {
     if (!g) return '0/0';
     const text = `${g.completedQuestions}/${g.targetQuestions}`;
     console.log('Meta de questões - Completadas:', g.completedQuestions, 'Meta:', g.targetQuestions, 'Texto:', text);
+    console.log('Objeto completo da meta:', g);
     return text;
   });
 
