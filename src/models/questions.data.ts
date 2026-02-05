@@ -245,5 +245,30 @@ export const QUESTIONS_POOL: Record<string, Omit<Simulado, 'id'>[]> = {
     { subject: 'Gramática', question: 'Silaba tônica de "Café":', options: ['Ca', 'Fé', 'Nenhuma', 'Ambas'], correctAnswerIndex: 1, explanation: 'Oxítona.' },
     { subject: 'Gramática', question: 'Uso dos "porquês" (final de frase):', options: ['Porque', 'Por que', 'Porquê', 'Por quê'], correctAnswerIndex: 3, explanation: 'Separado e com acento.' },
     { subject: 'Gramática', question: 'Vírgula serve para:', options: ['Terminar frase', 'Omitir letra', 'Pausar/Separar', 'Gritar'], correctAnswerIndex: 2, explanation: 'Pausa ou separação de termos.' }
+  ],
+  'ENEM': [
+    { subject: 'ENEM', question: 'No ENEM, a prova de Redação exige qual tipo de texto?', options: ['Narrativo', 'Dissertativo-argumentativo', 'Descritivo', 'Lírico'], correctAnswerIndex: 1, explanation: 'A redação do ENEM exige a defesa de um ponto de vista com proposta de intervenção.' },
+    { subject: 'ENEM', question: 'Qual o tema central da prova de Ciências da Natureza?', options: ['Apenas Física', 'Biologia, Física e Química', 'Geografia e História', 'Português e Inglês'], correctAnswerIndex: 1, explanation: 'Engloba as três áreas científicas.' },
+    { subject: 'ENEM', question: 'O ENEM é a principal porta de entrada para:', options: ['Apenas escolas técnicas', 'Universidades Federais via SISU', 'Escolas militares', 'Cursos de curta duração'], correctAnswerIndex: 1, explanation: 'O SISU utiliza a nota do ENEM para seleção em universidades públicas.' },
+    { subject: 'ENEM', question: 'Matemática e Suas Tecnologias no ENEM foca muito em:', options: ['Cálculo avançado', 'Razão, proporção e interpretação', 'Apenas Geometria', 'História da Matemática'], correctAnswerIndex: 1, explanation: 'A prova é baseada em competências e habilidades cotidianas.' },
+    { subject: 'ENEM', question: 'A prova de Linguagens inclui qual destas matérias?', options: ['Filosofia', 'Artes e Educação Física', 'Biologia', 'Química'], correctAnswerIndex: 1, explanation: 'Linguagens engloba Português, Literature, Artes, Educação Física e Língua Estrangeira.' },
+    { subject: 'ENEM', question: 'Qual o período histórico mais cobrado em História do Brasil no ENEM?', options: ['Brasil Colônia', 'Brasil Império', 'Era Vargas e Ditadura Militar', 'Pré-história'], correctAnswerIndex: 2, explanation: 'História Contemporânea do Brasil é muito recorrente.' },
+    { subject: 'ENEM', question: 'Em Geografia, o ENEM costuma focar muito em:', options: ['Apenas mapas', 'Questões ambientais e urbanização', 'Apenas nomes de rios', 'Astronomia pura'], correctAnswerIndex: 1, explanation: 'Temas sociais e ambientais são centrais.' },
+    { subject: 'ENEM', question: 'A prova de Sociologia e Filosofia no ENEM pertence a qual área?', options: ['Linguagens', 'Ciências Humanas', 'Ciências da Natureza', 'Matemática'], correctAnswerIndex: 1, explanation: 'Ciências Humanas e Suas Tecnologias.' },
+    { subject: 'ENEM', question: 'O que é a TRI no ENEM?', options: ['Tempo de Resposta Imediato', 'Teoria de Resposta ao Item', 'Teste Radiológico Individual', 'Triângulo de Respostas'], correctAnswerIndex: 1, explanation: 'Sistema de correção que valoriza a coerência das respostas.' }
+  ],
+  'UNICAMP': [
+    { subject: 'UNICAMP', question: 'Qual a característica marcante da redação da UNICAMP?', options: ['Sempre dissertativa', 'Gêneros textuais variados (carta, manifesto, etc)', 'Apenas poema', 'Não tem redação'], correctAnswerIndex: 1, explanation: 'A UNICAMP solicita gêneros diferentes a cada ano.' },
+    { subject: 'UNICAMP', question: 'A UNICAMP é localizada em qual cidade?', options: ['São Paulo', 'Campinas', 'São Carlos', 'Ribeirão Preto'], correctAnswerIndex: 1, explanation: 'Universidade Estadual de Campinas.' },
+    { subject: 'UNICAMP', question: 'Como é a primeira fase da UNICAMP?', options: ['90 questões objetivas', '72 questões objetivas', 'Redação e questões', 'Apenas 10 questões'], correctAnswerIndex: 1, explanation: 'Atualmente a 1ª fase tem 72 questões de múltipla escolha.' },
+    { subject: 'UNICAMP', question: 'A prova da UNICAMP é conhecida por ser:', options: ['Apenas decoreba', 'Interdisciplinar e crítica', 'Apenas contas de matemática', 'Muito fácil'], correctAnswerIndex: 1, explanation: 'Valoriza a leitura crítica e a relação entre matérias.' },
+    { subject: 'UNICAMP', question: 'Qual o nome do vestibular da UNICAMP?', options: ['FUVEST', 'VUNESP', 'COMVEST', 'SISU'], correctAnswerIndex: 2, explanation: 'Comissão Permanente para os Vestibulares da UNICAMP.' }
+  ],
+  'FUVEST': [
+    { subject: 'FUVEST', question: 'A FUVEST é o vestibular de qual universidade?', options: ['UNICAMP', 'UNESP', 'USP', 'UNIFESP'], correctAnswerIndex: 2, explanation: 'Fundação Universitária para o Vestibular seleciona alunos para a USP.' },
+    { subject: 'FUVEST', question: 'A primeira fase da FUVEST consiste em:', options: ['Redação e 10 questões', '90 questões de múltipla escolha', 'Questões dissertativas', 'Apenas prova de livros'], correctAnswerIndex: 1, explanation: 'A 1ª fase tem 90 questões objetivas.' },
+    { subject: 'FUVEST', question: 'Qual a característica principal das questões de Literatura da FUVEST?', options: ['Apenas gramática', 'Lista de livros obrigatórios', 'Interpretação de textos em inglês', 'Não cai literatura'], correctAnswerIndex: 1, explanation: 'A FUVEST exige a leitura de uma lista específica de obras literárias.' },
+    { subject: 'FUVEST', question: 'A segunda fase da FUVEST é:', options: ['Também múltipla escolha', 'Dissertativa', 'Apenas redação', 'Entrevista'], correctAnswerIndex: 1, explanation: 'A 2ª fase exige respostas escritas detalhadas.' },
+    { subject: 'FUVEST', question: 'Quantas questões de cada matéria costumam cair na 1ª fase (aproximadamente)?', options: ['5', '10', '20', '30'], correctAnswerIndex: 1, explanation: 'Geralmente 10 questões por área principal.' }
   ]
 };

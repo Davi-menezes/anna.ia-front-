@@ -139,11 +139,12 @@ export class FlashcardsModalComponent {
   async loadUserCredits() {
     try {
       const res = await lastValueFrom(
-        this.http.get<{ success: boolean; user: any }>(`${environment.apiUrl}/user/profile`, { headers: this.headers() })
+        this.http.get<{ success: boolean; user: any }>(`${environment.apiUrl}/auth/me`, { headers: this.headers() })
       );
-      console.log('Resposta do backend:', res);
-      console.log('Créditos encontrados:', res.user?.credits);
-      this.creditsRemaining.set(res.user?.credits || 0);
+      console.log('Resposta do auth/me:', res);
+      const credits = res.user?.credits ?? 0;
+      console.log('Créditos encontrados:', credits);
+      this.creditsRemaining.set(credits);
     } catch (e) {
       console.error('Erro ao carregar créditos:', e);
     }
@@ -194,17 +195,16 @@ export class FlashcardsModalComponent {
     this.success.set(null);
 
     try {
-      // Filtrar apenas requests com matéria preenchida
+      // Filtrar apenas requests com matéria preenchida ou usar 'Geral' se nada preenchido
       const validRequests = this.flashcardRequests().filter(req => req.subject.trim().length > 0);
-
-      if (validRequests.length === 0) {
-        this.error.set('Preencha pelo menos uma matéria para gerar flashcards.');
-        return;
+      let finalRequests = validRequests;
+      if (finalRequests.length === 0) {
+        finalRequests = [{ subject: 'Geral' }];
       }
 
       // Agrupar por matéria para otimizar chamadas à API
-      const groupedBySubject = validRequests.reduce((acc, req) => {
-        const subject = req.subject.trim();
+      const groupedBySubject = finalRequests.reduce((acc, req) => {
+        const subject = req.subject?.trim() || 'Geral';
         if (!acc[subject]) acc[subject] = [];
         if (req.front?.trim()) {
           acc[subject].push(req.front.trim());
@@ -216,7 +216,7 @@ export class FlashcardsModalComponent {
 
       // Gerar flashcards para cada matéria
       for (const [subject, topics] of Object.entries(groupedBySubject)) {
-        const count = Math.min(topics.length || 10, 10);
+        const count = Math.min((topics as string[]).length || 10, 10);
 
         const res = await lastValueFrom(
           this.http.post<{ success: boolean; data: any }>(
@@ -224,7 +224,7 @@ export class FlashcardsModalComponent {
             {
               subject,
               count,
-              topics: topics.length > 0 ? topics : undefined
+              topics: (topics as string[]).length > 0 ? topics : undefined
             },
             { headers: this.headers() }
           )

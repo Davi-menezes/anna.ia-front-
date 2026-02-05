@@ -33,7 +33,7 @@ export class QuestionGoalsComponent {
 
   goal = signal<QuestionGoal | null>(null);
   targetInput = signal<number>(0);
-  
+
   // Para o TODO List de Metas de Estudo
   studyGoals = signal<StudyGoal[]>([]);
   newGoalTitle = signal('');
@@ -50,8 +50,8 @@ export class QuestionGoalsComponent {
   progressText = computed(() => {
     const g = this.goal();
     if (!g) return '0/0';
-    const text = `${g.completedQuestions}/${g.targetQuestions}`;
-    console.log('Meta de questões - Completadas:', g.completedQuestions, 'Meta:', g.targetQuestions, 'Texto:', text);
+    const text = `${g.targetQuestions}/${g.completedQuestions}`;
+    console.log('Meta de questões - Meta:', g.targetQuestions, 'Completadas:', g.completedQuestions, 'Texto:', text);
     console.log('Objeto completo da meta:', g);
     return text;
   });
@@ -148,7 +148,7 @@ export class QuestionGoalsComponent {
 
     this.studyGoals.set([...this.studyGoals(), newGoal]);
     this.saveStudyGoals();
-    
+
     // Limpar formulário
     this.newGoalTitle.set('');
     this.newGoalDescription.set('');
@@ -163,21 +163,21 @@ export class QuestionGoalsComponent {
   async updateGoal(goal: StudyGoal) {
     if (this.editingGoalId() === goal.id) {
       // Salvar edição
-      const updatedGoals = this.studyGoals().map(g => 
-        g.id === goal.id 
+      const updatedGoals = this.studyGoals().map(g =>
+        g.id === goal.id
           ? { ...g, title: this.newGoalTitle(), description: this.newGoalDescription() || undefined }
           : g
       );
       this.studyGoals.set(updatedGoals);
       this.saveStudyGoals();
-      
+
       // Limpar edição
       this.editingGoalId.set(null);
       this.newGoalTitle.set('');
       this.newGoalDescription.set('');
     } else {
       // Toggle completion
-      const updatedGoals = this.studyGoals().map(g => 
+      const updatedGoals = this.studyGoals().map(g =>
         g.id === goal.id ? { ...g, completed: !g.completed } : g
       );
       this.studyGoals.set(updatedGoals);
@@ -186,7 +186,7 @@ export class QuestionGoalsComponent {
   }
 
   updateGoalStatus(goal: StudyGoal) {
-    const updatedGoals = this.studyGoals().map(g => 
+    const updatedGoals = this.studyGoals().map(g =>
       g.id === goal.id ? { ...g, completed: !g.completed } : g
     );
     this.studyGoals.set(updatedGoals);
