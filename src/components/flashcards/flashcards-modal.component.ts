@@ -115,7 +115,7 @@ export class FlashcardsModalComponent {
   private authService = inject(AuthService);
 
   enhancedApiUrl = `${environment.apiUrl}/flashcards-enhanced`;
-  
+
   isGenerating = signal(false);
   error = signal<string | null>(null);
   success = signal<string | null>(null);
@@ -139,11 +139,11 @@ export class FlashcardsModalComponent {
   async loadUserCredits() {
     try {
       const res = await lastValueFrom(
-        this.http.get<{ success: boolean; data: any }>(`${environment.apiUrl}/user/profile`, { headers: this.headers() })
+        this.http.get<{ success: boolean; user: any }>(`${environment.apiUrl}/user/profile`, { headers: this.headers() })
       );
       console.log('Resposta do backend:', res);
-      console.log('Créditos encontrados:', res.data.user?.credits);
-      this.creditsRemaining.set(res.data.user?.credits || 0);
+      console.log('Créditos encontrados:', res.user?.credits);
+      this.creditsRemaining.set(res.user?.credits || 0);
     } catch (e) {
       console.error('Erro ao carregar créditos:', e);
     }
@@ -196,7 +196,7 @@ export class FlashcardsModalComponent {
     try {
       // Filtrar apenas requests com matéria preenchida
       const validRequests = this.flashcardRequests().filter(req => req.subject.trim().length > 0);
-      
+
       if (validRequests.length === 0) {
         this.error.set('Preencha pelo menos uma matéria para gerar flashcards.');
         return;
@@ -217,11 +217,11 @@ export class FlashcardsModalComponent {
       // Gerar flashcards para cada matéria
       for (const [subject, topics] of Object.entries(groupedBySubject)) {
         const count = Math.min(topics.length || 10, 10);
-        
+
         const res = await lastValueFrom(
           this.http.post<{ success: boolean; data: any }>(
             `${this.enhancedApiUrl}/generate`,
-            { 
+            {
               subject,
               count,
               topics: topics.length > 0 ? topics : undefined
@@ -238,10 +238,10 @@ export class FlashcardsModalComponent {
       if (allGeneratedFlashcards.length > 0) {
         this.success.set(`${allGeneratedFlashcards.length} flashcards gerados com sucesso!`);
         this.creditsRemaining.set(this.creditsRemaining() - 0.5);
-        
+
         // Emitir evento com os flashcards gerados
-        const event = new CustomEvent('flashcardsGenerated', { 
-          detail: { flashcards: allGeneratedFlashcards } 
+        const event = new CustomEvent('flashcardsGenerated', {
+          detail: { flashcards: allGeneratedFlashcards }
         });
         window.dispatchEvent(event);
 

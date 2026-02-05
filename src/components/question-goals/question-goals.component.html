@@ -2,12 +2,13 @@
   <div class="flex items-start justify-between gap-4">
     <div>
       <h1 class="text-2xl font-bold text-futuristic-text dark:text-dark-text">Meta de Questões (Hoje)</h1>
-      <p class="text-sm text-futuristic-subtext dark:text-dark-subtext mt-1">Defina uma meta e marque o progresso para manter consistência.</p>
+      <p class="text-sm text-futuristic-subtext dark:text-dark-subtext mt-1">Defina uma meta e marque o progresso para
+        manter consistência.</p>
     </div>
   </div>
 
   @if (error()) {
-    <p class="mt-4 text-sm text-red-600">{{ error() }}</p>
+  <p class="mt-4 text-sm text-red-600">{{ error() }}</p>
   }
 
   <div class="mt-6 p-5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
@@ -23,19 +24,27 @@
     </div>
 
     <div class="mt-4 w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
-      <div class="bg-gradient-to-r from-futuristic-secondary to-futuristic-primary h-3 rounded-full transition-all duration-500" [style.width.%]="progressPct()"></div>
+      <div
+        class="bg-gradient-to-r from-futuristic-secondary to-futuristic-primary h-3 rounded-full transition-all duration-500"
+        [style.width.%]="progressPct()"></div>
     </div>
 
     <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
       <div>
         <label class="text-xs text-futuristic-subtext dark:text-dark-subtext">Meta (nº de questões)</label>
-        <input type="number" [(ngModel)]="targetInput" min="0" class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800" />
+        <input type="number" [ngModel]="targetInput()" (ngModelChange)="targetInput.set($event)" min="0"
+          class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800" />
       </div>
       <div class="md:col-span-2 flex items-end gap-2">
-        <button (click)="saveTarget()" [disabled]="isLoading()" class="px-4 py-2 rounded-lg bg-futuristic-primary text-white text-sm hover:bg-futuristic-secondary disabled:opacity-50">Salvar meta</button>
-        <button (click)="addProgress(1)" [disabled]="isLoading()" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 text-sm">+1</button>
-        <button (click)="addProgress(5)" [disabled]="isLoading()" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 text-sm">+5</button>
-        <button (click)="addProgress(10)" [disabled]="isLoading()" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 text-sm">+10</button>
+        <button (click)="saveTarget()" [disabled]="isLoading()"
+          class="px-4 py-2 rounded-lg bg-futuristic-primary text-white text-sm hover:bg-futuristic-secondary disabled:opacity-50">Salvar
+          meta</button>
+        <button (click)="addProgress(1)" [disabled]="isLoading()"
+          class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 text-sm">+1</button>
+        <button (click)="addProgress(5)" [disabled]="isLoading()"
+          class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 text-sm">+5</button>
+        <button (click)="addProgress(10)" [disabled]="isLoading()"
+          class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 text-sm">+10</button>
       </div>
     </div>
 
@@ -47,70 +56,51 @@
   <!-- TODO List de Metas de Estudo -->
   <div class="mt-8 p-5 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
     <h2 class="text-lg font-semibold text-futuristic-text dark:text-dark-text mb-4">Metas de Estudo</h2>
-    
+
     <!-- Formulário para adicionar nova meta -->
     <div class="mb-4 p-3 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-700">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <input 
-          [(ngModel)]="newGoalTitle" 
-          placeholder="Título da meta" 
-          class="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
-        />
-        <input 
-          [(ngModel)]="newGoalDescription" 
-          placeholder="Descrição (opcional)" 
-          class="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
-        />
+        <input [(ngModel)]="newGoalTitle" placeholder="Título da meta"
+          class="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
+        <input [(ngModel)]="newGoalDescription" placeholder="Descrição (opcional)"
+          class="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm" />
       </div>
-      <button 
-        (click)="addNewGoal()" 
-        [disabled]="isLoading() || !newGoalTitle().trim()"
-        class="mt-2 px-3 py-1.5 rounded-lg bg-futuristic-primary text-white text-sm hover:bg-futuristic-secondary disabled:opacity-50"
-      >
+      <button (click)="addNewGoal()" [disabled]="isLoading() || !newGoalTitle().trim()"
+        class="mt-2 px-3 py-1.5 rounded-lg bg-futuristic-primary text-white text-sm hover:bg-futuristic-secondary disabled:opacity-50">
         + Adicionar meta
       </button>
     </div>
-    
+
     <ul class="space-y-3">
       @for (studyGoal of studyGoals(); track studyGoal.id) {
-        <li class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-slate-700">
-          <input 
-            type="checkbox" 
-            [(ngModel)]="studyGoal.completed"
-            (change)="updateGoalStatus(studyGoal)"
-            class="mt-1 rounded border-gray-300 text-futuristic-primary focus:ring-futuristic-primary"
-          />
-          <div class="flex-1">
-            <p class="text-sm font-medium text-futuristic-text dark:text-dark-text" 
-               [class.line-through]="studyGoal.completed" 
-               [class.opacity-60]="studyGoal.completed">
-              {{ studyGoal.title }}
-            </p>
-            @if (studyGoal.description) {
-              <p class="text-xs text-futuristic-subtext dark:text-dark-subtext">{{ studyGoal.description }}</p>
-            }
-          </div>
-          <div class="flex gap-2">
-            <button 
-              (click)="editGoal(studyGoal)"
-              class="px-2 py-1 rounded border border-gray-300 dark:border-slate-700 text-xs"
-            >
-              Editar
-            </button>
-            <button 
-              (click)="deleteGoal(studyGoal.id)"
-              class="px-2 py-1 rounded bg-red-600 text-white text-xs"
-            >
-              Apagar
-            </button>
-          </div>
-        </li>
+      <li class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-slate-700">
+        <input type="checkbox" [(ngModel)]="studyGoal.completed" (change)="updateGoalStatus(studyGoal)"
+          class="mt-1 rounded border-gray-300 text-futuristic-primary focus:ring-futuristic-primary" />
+        <div class="flex-1">
+          <p class="text-sm font-medium text-futuristic-text dark:text-dark-text"
+            [class.line-through]="studyGoal.completed" [class.opacity-60]="studyGoal.completed">
+            {{ studyGoal.title }}
+          </p>
+          @if (studyGoal.description) {
+          <p class="text-xs text-futuristic-subtext dark:text-dark-subtext">{{ studyGoal.description }}</p>
+          }
+        </div>
+        <div class="flex gap-2">
+          <button (click)="editGoal(studyGoal)"
+            class="px-2 py-1 rounded border border-gray-300 dark:border-slate-700 text-xs">
+            Editar
+          </button>
+          <button (click)="deleteGoal(studyGoal.id)" class="px-2 py-1 rounded bg-red-600 text-white text-xs">
+            Apagar
+          </button>
+        </div>
+      </li>
       }
-      
+
       @if (studyGoals().length === 0) {
-        <li class="text-center text-sm text-futuristic-subtext dark:text-dark-subtext py-4">
-          Nenhuma meta de estudo ainda. Adicione sua primeira meta acima.
-        </li>
+      <li class="text-center text-sm text-futuristic-subtext dark:text-dark-subtext py-4">
+        Nenhuma meta de estudo ainda. Adicione sua primeira meta acima.
+      </li>
       }
     </ul>
   </div>

@@ -153,18 +153,33 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    // Backend enforces credits and also allows 1 free trial simulado per user.
-
     this.selectedSubject.set(subject);
     this.isLoadingSimulado.set(true);
     this.simuladoError.set(null);
     this.currentExamQuestions.set([]);
 
     try {
-      const questions = await this.studyPlanService.generateSimulado(subject);
-      this.currentExamQuestions.set(questions);
-      this.currentQuestionIndex.set(0);
-      this.selectedAnswer.set(null);
+      // Check if we have local questions for this subject
+      if (this.allQuestions[subject]) {
+        console.log(`Using local questions for ${subject}`);
+        const localQuestions = [...this.allQuestions[subject]];
+        this.shuffleArray(localQuestions);
+        // Add IDs and limit to 30 questions
+        const questions = localQuestions.slice(0, 30).map((q, index) => ({
+          ...q,
+          id: index
+        })) as Simulado[];
+
+        this.currentExamQuestions.set(questions);
+        this.currentQuestionIndex.set(0);
+        this.selectedAnswer.set(null);
+      } else {
+        // Fallback to AI if not in local pool
+        const questions = await this.studyPlanService.generateSimulado(subject);
+        this.currentExamQuestions.set(questions);
+        this.currentQuestionIndex.set(0);
+        this.selectedAnswer.set(null);
+      }
     } catch (error: any) {
       if (error?.status === 403 || error?.error?.code === 'OUT_OF_CREDITS') {
         this.userService.isOutOfCreditsModalOpen.set(true);
