@@ -10,10 +10,11 @@ import { QUESTIONS_POOL } from '../../models/questions.data';
 import { Vestibular } from '../../models/vestibular.model';
 import { GeminiService } from '../../services/gemini.service';
 import { UserService } from '../../services/user.service';
-import { StudyPlanService } from '../../services/study-plan.service'; // Import StudyPlanService
+import { StudyPlanService } from '../../services/study-plan.service';
 import { CreditsModalComponent } from '../credits-modal/credits-modal.component';
 import { TiltDirective } from '../../directives/tilt.directive';
 import { OnboardingModalComponent } from '../onboarding-modal/onboarding-modal.component';
+import { QuestionGoalService } from '../../services/question-goal.service';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +26,8 @@ import { OnboardingModalComponent } from '../onboarding-modal/onboarding-modal.c
 export class HomeComponent implements OnInit {
   geminiService = inject(GeminiService);
   userService = inject(UserService);
-  studyPlanService = inject(StudyPlanService); // Inject StudyPlanService
+  studyPlanService = inject(StudyPlanService);
+  questionGoalService = inject(QuestionGoalService);
 
   userInput = signal('');
   messages = signal<ChatMessage[]>([]);
@@ -45,29 +47,33 @@ export class HomeComponent implements OnInit {
   // Onboarding State
   showOnboarding = signal(false);
 
+  // Simulado Confirmation State
+  showSimuladoConfirm = signal(false);
+  simuladoToStart = signal<string | null>(null);
+
   vestibulares = signal<Vestibular[]>([
     {
       acronym: 'ENEM',
       name: 'Exame Nacional do Ensino Médio',
-      description: 'Principal porta de entrada para universidades públicas e privadas no Brasil, utilizando a nota para o Sisu, Prouni e Fies.',
-      registrationPeriod: '27 de Maio a 7 de Junho de 2024',
-      examDates: ['3 de Novembro de 2024', '10 de Novembro de 2024'],
+      description: 'Principal porta de entrada para universidades públicas e privadas no Brasil.',
+      registrationPeriod: 'Maio a Junho de 2026',
+      examDates: ['Novembro de 2026'],
       officialSiteUrl: 'https://www.gov.br/inep/pt-br/areas-de-atuacao/avaliacao-e-exames-educacionais/enem'
     },
     {
       acronym: 'FUVEST',
       name: 'Fundação Universitária para o Vestibular',
-      description: 'Processo seletivo para ingresso na Universidade de São Paulo (USP), um dos mais concorridos e prestigiados do país.',
-      registrationPeriod: '19 de Agosto a 8 de Outubro de 2024',
-      examDates: ['1ª fase: 17 de Novembro de 2024', '2ª fase: 15 e 16 de Dezembro de 2024'],
+      description: 'Processo seletivo para ingresso na Universidade de São Paulo (USP).',
+      registrationPeriod: 'Agosto a Outubro de 2025 (para 2026)',
+      examDates: ['Novembro de 2025', 'Dezembro de 2025'],
       officialSiteUrl: 'https://www.fuvest.br/'
     },
     {
       acronym: 'UNICAMP',
       name: 'Vestibular da Unicamp',
-      description: 'Processo seletivo para a Universidade Estadual de Campinas (UNICAMP), conhecido por suas questões interdisciplinares e contextualizadas.',
-      registrationPeriod: '1 de Agosto a 3 de Setembro de 2024',
-      examDates: ['1ª fase: 20 de Outubro de 2024', '2ª fase: 1 e 2 de Dezembro de 2024'],
+      description: 'Processo seletivo para a Universidade Estadual de Campinas.',
+      registrationPeriod: 'Agosto a Setembro de 2025 (para 2026)',
+      examDates: ['Outubro de 2025', 'Dezembro de 2025'],
       officialSiteUrl: 'https://www.comvest.unicamp.br/'
     },
   ]);
@@ -152,19 +158,37 @@ export class HomeComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+    this.simuladoToStart.set(subject);
+    this.showSimuladoConfirm.set(true);
+  }
 
+  cancelSimulado() {
+    this.showSimuladoConfirm.set(false);
+    this.simuladoToStart.set(null);
+  }
+
+  async confirmStartSimulado() {
+    const subject = this.simuladoToStart();
+    if (!subject) return;
+
+    this.showSimuladoConfirm.set(false);
     this.selectedSubject.set(subject);
     this.isLoadingSimulado.set(true);
     this.simuladoError.set(null);
     this.currentExamQuestions.set([]);
 
     try {
-      // Check if we have local questions for this subject
+      // 1. Charge for the simulado
+      const chargeResult = await this.studyPlanService.chargeSimulado();
+      if (!chargeResult.success) {
+        throw new Error('Falha na cobrança de créditos.');
+      }
+
+      // 2. Load questions
       if (this.allQuestions[subject]) {
         console.log(`Using local questions for ${subject}`);
         const localQuestions = [...this.allQuestions[subject]];
         this.shuffleArray(localQuestions);
-        // Add IDs and limit to 30 questions
         const questions = localQuestions.slice(0, 30).map((q, index) => ({
           ...q,
           id: index
@@ -174,7 +198,6 @@ export class HomeComponent implements OnInit {
         this.currentQuestionIndex.set(0);
         this.selectedAnswer.set(null);
       } else {
-        // Fallback to AI if not in local pool
         const questions = await this.studyPlanService.generateSimulado(subject);
         this.currentExamQuestions.set(questions);
         this.currentQuestionIndex.set(0);
@@ -183,12 +206,14 @@ export class HomeComponent implements OnInit {
     } catch (error: any) {
       if (error?.status === 403 || error?.error?.code === 'OUT_OF_CREDITS') {
         this.userService.isOutOfCreditsModalOpen.set(true);
-        this.simuladoError.set('Créditos insuficientes para gerar simulado.');
+        this.simuladoError.set('Créditos insuficientes para iniciar este simulado.');
+        this.selectedSubject.set(null); // Close the exam modal if it opened
       } else {
-        this.simuladoError.set(error.message || 'Erro desconhecido ao gerar o simulado.');
+        this.simuladoError.set(error.message || 'Erro desconhecido ao iniciar o simulado.');
       }
     } finally {
       this.isLoadingSimulado.set(false);
+      this.simuladoToStart.set(null);
     }
   }
 
@@ -205,6 +230,16 @@ export class HomeComponent implements OnInit {
     if (this.selectedAnswer() !== null) return;
 
     this.selectedAnswer.set(optionIndex);
+
+    // Track progress if correct
+    const question = this.currentQuestion;
+    if (question && optionIndex === question.correctAnswerIndex) {
+      try {
+        await this.questionGoalService.addProgress(1);
+      } catch (err) {
+        console.error('Error updating question goal progress:', err);
+      }
+    }
   }
 
   nextQuestion() {

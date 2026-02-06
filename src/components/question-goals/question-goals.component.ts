@@ -6,6 +6,7 @@ import { lastValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 import { QuestionGoal } from '../../models/question-goal.model';
+import { QuestionGoalService } from '../../services/question-goal.service';
 
 interface StudyGoal {
   id: string;
@@ -22,8 +23,7 @@ interface StudyGoal {
   templateUrl: './question-goals.component.html',
 })
 export class QuestionGoalsComponent {
-  private http = inject(HttpClient);
-  private authService = inject(AuthService);
+  private questionGoalService = inject(QuestionGoalService);
 
   apiUrl = `${environment.apiUrl}/question-goals`;
   studyGoalsApiUrl = `${environment.apiUrl}/study-goals`;
@@ -50,10 +50,7 @@ export class QuestionGoalsComponent {
   progressText = computed(() => {
     const g = this.goal();
     if (!g) return '0/0';
-    const text = `${g.targetQuestions}/${g.completedQuestions}`;
-    console.log('Meta de questões - Meta:', g.targetQuestions, 'Completadas:', g.completedQuestions, 'Texto:', text);
-    console.log('Objeto completo da meta:', g);
-    return text;
+    return `${g.completedQuestions}/${g.targetQuestions}`;
   });
 
   constructor() {
@@ -61,18 +58,12 @@ export class QuestionGoalsComponent {
     this.loadStudyGoals();
   }
 
-  private headers(): HttpHeaders {
-    const token = this.authService.getToken();
-    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
-  }
 
   async refresh() {
     this.isLoading.set(true);
     this.error.set(null);
     try {
-      const res = await lastValueFrom(
-        this.http.get<{ success: boolean; data: QuestionGoal }>(`${this.apiUrl}/today`, { headers: this.headers() })
-      );
+      const res = await this.questionGoalService.getTodayGoal();
       this.goal.set(res.data);
       this.targetInput.set(res.data.targetQuestions || 0);
     } catch (e: any) {
@@ -107,9 +98,7 @@ export class QuestionGoalsComponent {
     this.error.set(null);
     try {
       const targetQuestions = Number(this.targetInput());
-      const res = await lastValueFrom(
-        this.http.post<{ success: boolean; data: QuestionGoal }>(`${this.apiUrl}/today`, { targetQuestions }, { headers: this.headers() })
-      );
+      const res = await this.questionGoalService.setTodayGoal(targetQuestions);
       this.goal.set(res.data);
     } catch (e: any) {
       this.error.set('Erro ao salvar meta.');
@@ -122,9 +111,7 @@ export class QuestionGoalsComponent {
     this.isLoading.set(true);
     this.error.set(null);
     try {
-      const res = await lastValueFrom(
-        this.http.put<{ success: boolean; data: QuestionGoal }>(`${this.apiUrl}/today`, { amount }, { headers: this.headers() })
-      );
+      const res = await this.questionGoalService.addProgress(amount);
       this.goal.set(res.data);
     } catch (e: any) {
       this.error.set('Erro ao atualizar progresso.');

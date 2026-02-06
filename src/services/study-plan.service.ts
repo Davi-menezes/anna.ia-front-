@@ -22,21 +22,21 @@ export class StudyPlanService {
     return await lastValueFrom(this.http.get<{ success: boolean; data: any }>(`${this.apiUrl}`, { headers }));
   }
 
-  async createPlan(payload: any): Promise<{ success: boolean; data: any }>{
+  async createPlan(payload: any): Promise<{ success: boolean; data: any }> {
     const token = this.authService.getToken();
     if (!token) throw new Error('Não autenticado');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return await lastValueFrom(this.http.post<{ success: boolean; data: any }>(`${this.apiUrl}`, payload, { headers }));
   }
 
-  async generateWeekly(planId: string): Promise<{ success: boolean; data: any }>{
+  async generateWeekly(planId: string): Promise<{ success: boolean; data: any }> {
     const token = this.authService.getToken();
     if (!token) throw new Error('Não autenticado');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return await lastValueFrom(this.http.post<{ success: boolean; data: any }>(`${this.apiUrl}/${planId}/generate`, {}, { headers }));
   }
 
-  async updatePerformance(planId: string, subjectName: string, performance: string): Promise<{ success: boolean }>{
+  async updatePerformance(planId: string, subjectName: string, performance: string): Promise<{ success: boolean }> {
     const token = this.authService.getToken();
     if (!token) throw new Error('Não autenticado');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -46,7 +46,6 @@ export class StudyPlanService {
   async generateSimulado(subject: string): Promise<Simulado[]> {
     const token = this.authService.getToken();
     if (!token) {
-      // Or handle error more gracefully
       throw new Error('Não autenticado');
     }
 
@@ -66,8 +65,28 @@ export class StudyPlanService {
       }
     } catch (error) {
       console.error('Error generating simulado:', error);
-      // Let the component handle the error display
       throw error;
     }
+  }
+
+  async chargeSimulado(): Promise<{ success: boolean; credits: number; freeTrialUsed?: boolean }> {
+    const token = this.authService.getToken();
+    if (!token) throw new Error('Não autenticado');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    const response = await lastValueFrom(
+      this.http.post<{ success: boolean; credits: number; freeTrialUsed?: boolean }>(`${this.apiUrl}/simulado/charge`, {}, { headers })
+    );
+
+    if (response.success) {
+      this.userService.credits.set(response.credits);
+      if (response.freeTrialUsed) {
+        const currentUser = this.userService.user();
+        if (currentUser) {
+          this.userService.user.set({ ...currentUser, freeSimuladoUsed: true } as any);
+        }
+      }
+    }
+    return response;
   }
 }

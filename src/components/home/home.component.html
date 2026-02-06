@@ -82,7 +82,7 @@
           </div>
         </div>
       </a>
-      
+
       <a routerLink="/question-goals" appTilt
         class="block text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-6 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60">
         <div class="flex items-center gap-4">
@@ -207,15 +207,47 @@
 </div>
 
 <!-- Modal de Simulado -->
+<!-- Modal de Confirmação de Simulado -->
+@if (showSimuladoConfirm()) {
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
+  <div
+    class="bg-white dark:bg-slate-800 rounded-2xl p-8 w-full max-w-md shadow-2xl border border-orange-200 dark:border-orange-900/30 text-center animate-in fade-in zoom-in duration-300">
+    <div
+      class="w-16 h-16 bg-orange-100 dark:bg-orange-900/40 rounded-full flex items-center justify-center mx-auto mb-6">
+      <i class="fas fa-play text-2xl text-orange-500 ml-1"></i>
+    </div>
+    <h3 class="text-2xl font-bold text-futuristic-text dark:text-dark-text mb-2">Iniciar Simulado</h3>
+    <p class="text-futuristic-subtext dark:text-dark-subtext mb-6">
+      Você está prestes a iniciar o simulado de <strong>{{ simuladoToStart() }}</strong>.
+      <br><br>
+      <span
+        class="text-orange-600 dark:text-orange-400 font-semibold px-4 py-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+        {{ userService.user()?.freeSimuladoUsed ? 'Custo: 1 Crédito' : 'Custo: Grátis (Primeiro Simulado!)' }}
+      </span>
+    </p>
+    <div class="flex gap-3">
+      <button (click)="cancelSimulado()"
+        class="flex-1 px-6 py-3 border border-gray-300 dark:border-slate-600 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-gray-600 dark:text-gray-300 font-medium">
+        Cancelar
+      </button>
+      <button (click)="confirmStartSimulado()"
+        class="flex-1 px-6 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-all font-bold shadow-lg shadow-orange-500/30">
+        Começar agora
+      </button>
+    </div>
+  </div>
+</div>
+}
 @if (selectedSubject()) {
 <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
   <div
     class="bg-white dark:bg-slate-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-semibold text-futuristic-text dark:text-dark-text">
-        {{ selectedSubject() }} 
+        {{ selectedSubject() }}
         @if(currentExamQuestions().length > 0) {
-          <span class="text-sm font-normal text-gray-500">({{ currentQuestionIndex() + 1 }}/{{ currentExamQuestions().length }})</span>
+        <span class="text-sm font-normal text-gray-500">({{ currentQuestionIndex() + 1 }}/{{
+          currentExamQuestions().length }})</span>
         }
       </h3>
       <button (click)="closeExam()"
@@ -227,56 +259,58 @@
     </div>
 
     @if (isLoadingSimulado()) {
-      <div class="text-center py-10">
-        <p class="text-futuristic-subtext dark:text-dark-subtext">Carregando seu simulado... 📚</p>
-      </div>
+    <div class="text-center py-10">
+      <p class="text-futuristic-subtext dark:text-dark-subtext">Carregando seu simulado... 📚</p>
+    </div>
     } @else if (simuladoError()) {
-      <div class="text-center py-10">
-        <p class="text-red-500 font-medium">Erro ao gerar simulado:</p>
-        <p class="text-futuristic-subtext dark:text-dark-subtext mt-2">{{ simuladoError() }}</p>
-        <button (click)="openExam(selectedSubject()!)" class="mt-4 px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors">Tentar Novamente</button>
-      </div>
+    <div class="text-center py-10">
+      <p class="text-red-500 font-medium">Erro ao gerar simulado:</p>
+      <p class="text-futuristic-subtext dark:text-dark-subtext mt-2">{{ simuladoError() }}</p>
+      <button (click)="openExam(selectedSubject()!)"
+        class="mt-4 px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors">Tentar
+        Novamente</button>
+    </div>
     } @else if (currentQuestion; as question) {
-      <p class="mb-6 text-futuristic-subtext dark:text-dark-subtext font-medium text-lg">
-        {{ question.question }}
-      </p>
+    <p class="mb-6 text-futuristic-subtext dark:text-dark-subtext font-medium text-lg">
+      {{ question.question }}
+    </p>
 
-      <div class="space-y-3 mb-6">
-        @for (option of question.options; track $index) {
-        <button (click)="submitAnswer($index)" [disabled]="selectedAnswer() !== null"
-          [class.bg-futuristic-primary]="selectedAnswer() === $index" [class.text-white]="selectedAnswer() === $index"
-          [class.border-futuristic-primary]="selectedAnswer() === null"
-          [class.border-green-500]="selectedAnswer() === $index && $index === question.correctAnswerIndex"
-          [class.border-red-500]="selectedAnswer() === $index && $index !== question.correctAnswerIndex && selectedAnswer() !== null"
-          class="w-full text-left p-3 border rounded-lg transition-colors disabled:opacity-90 hover:bg-gray-50 dark:hover:bg-slate-700/50">
-          {{ option }}
-        </button>
-        }
-      </div>
-
-      @if (selectedAnswer() !== null) {
-      <div class="p-4 rounded-lg mb-6" [class.bg-green-100]="selectedAnswer() === question.correctAnswerIndex"
-        [class.text-green-800]="selectedAnswer() === question.correctAnswerIndex"
-        [class.bg-red-100]="selectedAnswer() !== question.correctAnswerIndex"
-        [class.text-red-800]="selectedAnswer() !== question.correctAnswerIndex">
-        <p class="font-medium">
-          {{ selectedAnswer() === question.correctAnswerIndex ? "Resposta correta! 🎉" : "Resposta incorreta." }}
-        </p>
-        <p class="mt-2 text-sm">{{ question.explanation }}</p>
-      </div>
+    <div class="space-y-3 mb-6">
+      @for (option of question.options; track $index) {
+      <button (click)="submitAnswer($index)" [disabled]="selectedAnswer() !== null"
+        [class.bg-futuristic-primary]="selectedAnswer() === $index" [class.text-white]="selectedAnswer() === $index"
+        [class.border-futuristic-primary]="selectedAnswer() === null"
+        [class.border-green-500]="selectedAnswer() === $index && $index === question.correctAnswerIndex"
+        [class.border-red-500]="selectedAnswer() === $index && $index !== question.correctAnswerIndex && selectedAnswer() !== null"
+        class="w-full text-left p-3 border rounded-lg transition-colors disabled:opacity-90 hover:bg-gray-50 dark:hover:bg-slate-700/50">
+        {{ option }}
+      </button>
       }
+    </div>
 
-      <div class="flex justify-between mt-6">
-        <button (click)="prevQuestion()" [disabled]="currentQuestionIndex() === 0"
-          class="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300">
-          Anterior
-        </button>
+    @if (selectedAnswer() !== null) {
+    <div class="p-4 rounded-lg mb-6" [class.bg-green-100]="selectedAnswer() === question.correctAnswerIndex"
+      [class.text-green-800]="selectedAnswer() === question.correctAnswerIndex"
+      [class.bg-red-100]="selectedAnswer() !== question.correctAnswerIndex"
+      [class.text-red-800]="selectedAnswer() !== question.correctAnswerIndex">
+      <p class="font-medium">
+        {{ selectedAnswer() === question.correctAnswerIndex ? "Resposta correta! 🎉" : "Resposta incorreta." }}
+      </p>
+      <p class="mt-2 text-sm">{{ question.explanation }}</p>
+    </div>
+    }
 
-        <button (click)="nextQuestion()" [disabled]="currentQuestionIndex() === currentExamQuestions().length - 1"
-          class="px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-          Próxima
-        </button>
-      </div>
+    <div class="flex justify-between mt-6">
+      <button (click)="prevQuestion()" [disabled]="currentQuestionIndex() === 0"
+        class="px-4 py-2 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 dark:text-gray-300">
+        Anterior
+      </button>
+
+      <button (click)="nextQuestion()" [disabled]="currentQuestionIndex() === currentExamQuestions().length - 1"
+        class="px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        Próxima
+      </button>
+    </div>
     }
   </div>
 </div>
