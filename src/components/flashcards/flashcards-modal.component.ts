@@ -10,6 +10,7 @@ import { Flashcard } from '../../models/flashcard.model';
 interface FlashcardRequest {
   subject: string;
   front?: string;
+  topic?: string; // Mapped from front in UI for convenience
 }
 
 @Component({
@@ -36,7 +37,7 @@ interface FlashcardRequest {
               <div class="p-4 border border-gray-200 dark:border-slate-700 rounded-lg">
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-sm font-semibold text-futuristic-primary">Flashcard {{ i + 1 }}</span>
-                  <span class="text-xs text-gray-500">(opcional)</span>
+                  <span class="text-xs text-gray-500">(opcional - deixe vazio para aleatório)</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
@@ -44,7 +45,7 @@ interface FlashcardRequest {
                     <input 
                       [ngModel]="getFlashcardSubject(i)" 
                       (ngModelChange)="setFlashcardSubject(i, $event)" 
-                      placeholder="Ex: Matemática"
+                      placeholder="Ex: Matemática (ou deixe vazio)"
                       class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
                     />
                   </div>
@@ -76,11 +77,11 @@ interface FlashcardRequest {
               </button>
               <button 
                 (click)="generateFlashcards()" 
-                [disabled]="isGenerating() || !hasValidSubjects()"
-                class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm hover:bg-green-700 disabled:opacity-50"
+                [disabled]="isGenerating()"
+                class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm hover:bg-green-700 disabled:opacity-50 min-w-[200px]"
               >
                 @if (isGenerating()) { 
-                  <span class="flex items-center gap-2">
+                  <span class="flex items-center gap-2 justify-center">
                     <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -88,7 +89,7 @@ interface FlashcardRequest {
                     Gerando...
                   </span> 
                 } @else { 
-                  Gerar Flashcards
+                  {{ generateButtonText() }}
                 }
               </button>
             </div>
@@ -141,10 +142,7 @@ export class FlashcardsModalComponent {
       const res = await lastValueFrom(
         this.http.get<{ success: boolean; user: any }>(`${environment.apiUrl}/auth/me`, { headers: this.headers() })
       );
-      console.log('Resposta do auth/me:', res);
-      const credits = res.user?.credits ?? 0;
-      console.log('Créditos encontrados:', credits);
-      this.creditsRemaining.set(credits);
+      this.creditsRemaining.set(res.user?.credits ?? 0);
     } catch (e) {
       console.error('Erro ao carregar créditos:', e);
     }
@@ -152,6 +150,14 @@ export class FlashcardsModalComponent {
 
   hasValidSubjects(): boolean {
     return this.flashcardRequests().some(req => req.subject.trim().length > 0);
+  }
+
+  generateButtonText(): string {
+    const validCount = this.flashcardRequests().filter(req => req.subject.trim().length > 0).length;
+    if (validCount === 0) {
+      return 'Gerar Flashcards Aleatórios';
+    }
+    return 'Gerar Flashcards';
   }
 
   // Métodos para acesso seguro aos flashcards no template
@@ -179,12 +185,11 @@ export class FlashcardsModalComponent {
     if (!requests[index]) {
       requests[index] = { subject: '', front: '' };
     }
-    requests[index].front = value;
+    requests[index].front = value; // Na verdade é o tópico
     this.flashcardRequests.set([...requests]);
   }
 
   closeModal() {
-    // Emitir evento para fechar modal
     const event = new CustomEvent('closeFlashcardsModal');
     window.dispatchEvent(event);
   }
@@ -195,57 +200,35 @@ export class FlashcardsModalComponent {
     this.success.set(null);
 
     try {
-      // Filtrar apenas requests com matéria preenchida ou usar 'Geral' se nada preenchido
-      const validRequests = this.flashcardRequests().filter(req => req.subject.trim().length > 0);
-      let finalRequests = validRequests;
-      if (finalRequests.length === 0) {
-        finalRequests = [{ subject: 'Geral' }];
-      }
+      const allRequests = this.flashcardRequests();
 
-      // Agrupar por matéria para otimizar chamadas à API
-      const groupedBySubject = finalRequests.reduce((acc, req) => {
-        const subject = req.subject?.trim() || 'Geral';
-        if (!acc[subject]) acc[subject] = [];
-        if (req.front?.trim()) {
-          acc[subject].push(req.front.trim());
-        }
-        return acc;
-      }, {} as Record<string, string[]>);
+      // Preparar payload para o backend
+      // Mapeamos 'front' do frontend para 'topic' do backend, pois o campo 'front' na UI é usado como Tópico Específico
+      const payloadRequests = allRequests.map(req => ({
+        subject: req.subject.trim(), // Se vazio, backend trata como aleatório
+        topic: req.front?.trim() // Se vazio, ignorado
+      }));
 
-      const allGeneratedFlashcards: Flashcard[] = [];
+      const res = await lastValueFrom(
+        this.http.post<{ success: boolean; data: any }>(
+          `${this.enhancedApiUrl}/generate`,
+          {
+            flashcardRequests: payloadRequests
+          },
+          { headers: this.headers() }
+        )
+      );
 
-      // Gerar flashcards para cada matéria
-      for (const [subject, topics] of Object.entries(groupedBySubject)) {
-        const count = Math.min((topics as string[]).length || 10, 10);
-
-        const res = await lastValueFrom(
-          this.http.post<{ success: boolean; data: any }>(
-            `${this.enhancedApiUrl}/generate`,
-            {
-              subject,
-              count,
-              topics: (topics as string[]).length > 0 ? topics : undefined
-            },
-            { headers: this.headers() }
-          )
-        );
-
-        if (res.success && res.data.flashcards) {
-          allGeneratedFlashcards.push(...res.data.flashcards);
-        }
-      }
-
-      if (allGeneratedFlashcards.length > 0) {
-        this.success.set(`${allGeneratedFlashcards.length} flashcards gerados com sucesso!`);
-        this.creditsRemaining.set(this.creditsRemaining() - 0.5);
+      if (res.success && res.data.flashcards) {
+        this.success.set(`${res.data.flashcards.length} flashcards gerados com sucesso!`);
+        this.creditsRemaining.set(res.data.creditsRemaining);
 
         // Emitir evento com os flashcards gerados
         const event = new CustomEvent('flashcardsGenerated', {
-          detail: { flashcards: allGeneratedFlashcards }
+          detail: { flashcards: res.data.flashcards }
         });
         window.dispatchEvent(event);
 
-        // Fechar modal após 2 segundos
         setTimeout(() => this.closeModal(), 2000);
       } else {
         this.error.set('Nenhum flashcard foi gerado.');
