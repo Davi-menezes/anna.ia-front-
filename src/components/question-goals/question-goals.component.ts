@@ -50,7 +50,7 @@ export class QuestionGoalsComponent {
   progressText = computed(() => {
     const g = this.goal();
     if (!g) return '0/0';
-    return `${g.completedQuestions}/${g.targetQuestions}`;
+    return `${g.targetQuestions}/${g.completedQuestions}`;
   });
 
   constructor() {

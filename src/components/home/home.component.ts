@@ -179,7 +179,7 @@ export class HomeComponent implements OnInit {
 
     try {
       // 1. Charge for the simulado
-      const chargeResult = await this.studyPlanService.chargeSimulado();
+      const chargeResult = await this.studyPlanService.chargeSimulado(subject);
       if (!chargeResult.success) {
         throw new Error('Falha na cobrança de créditos.');
       }

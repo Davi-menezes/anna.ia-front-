@@ -15,6 +15,12 @@ export class StudyPlanService {
   private userService = inject(UserService);
   private apiUrl = `${environment.apiUrl}/study-plans`;
 
+  // Track active simulation session to avoid double charging
+  private activeSimulationSession = {
+    subject: null as string | null,
+    isActive: false
+  };
+
   async getActivePlan(): Promise<{ success: boolean; data: any }> {
     const token = this.authService.getToken();
     if (!token) throw new Error('Não autenticado');
@@ -69,7 +75,16 @@ export class StudyPlanService {
     }
   }
 
-  async chargeSimulado(): Promise<{ success: boolean; credits: number; freeTrialUsed?: boolean }> {
+  async chargeSimulado(subject?: string): Promise<{ success: boolean; credits: number; freeTrialUsed?: boolean }> {
+    // If there is an active session for this subject (or general if subject not provided but usually flow is per subject),
+    // we skip the charge. ideally we should track subject.
+    if (this.activeSimulationSession.isActive && this.activeSimulationSession.subject === subject) {
+      return { success: true, credits: this.userService.credits() };
+    }
+
+    // Set the subject for the new session attempt
+    if (subject) this.activeSimulationSession.subject = subject;
+
     const token = this.authService.getToken();
     if (!token) throw new Error('Não autenticado');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -79,6 +94,7 @@ export class StudyPlanService {
     );
 
     if (response.success) {
+      this.activeSimulationSession.isActive = true; // Mark session as active
       this.userService.credits.set(response.credits);
       if (response.freeTrialUsed) {
         const currentUser = this.userService.user();
