@@ -185,23 +185,36 @@ export class HomeComponent implements OnInit {
       }
 
       // 2. Load questions
-      if (this.allQuestions[subject]) {
-        console.log(`Using local questions for ${subject}`);
-        const localQuestions = [...this.allQuestions[subject]];
-        this.shuffleArray(localQuestions);
-        const questions = localQuestions.slice(0, 30).map((q, index) => ({
-          ...q,
-          id: index
-        })) as Simulado[];
+      // Check if resuming active session
+      if (this.studyPlanService.hasActiveSession(subject)) {
+        const session = this.studyPlanService.getSession();
+        this.currentExamQuestions.set(session.questions);
+        this.currentQuestionIndex.set(session.currentIndex);
+
+        // Restore current answer if available
+        const answer = session.answers[session.currentIndex] ?? null;
+        this.selectedAnswer.set(answer);
+      } else {
+        // New Session
+        let questions: Simulado[] = [];
+        if (this.allQuestions[subject]) {
+          console.log(`Using local questions for ${subject}`);
+          const localQuestions = [...this.allQuestions[subject]];
+          this.shuffleArray(localQuestions);
+          questions = localQuestions.slice(0, 30).map((q, index) => ({
+            ...q,
+            id: index
+          })) as Simulado[];
+        } else {
+          questions = await this.studyPlanService.generateSimulado(subject);
+        }
 
         this.currentExamQuestions.set(questions);
         this.currentQuestionIndex.set(0);
         this.selectedAnswer.set(null);
-      } else {
-        const questions = await this.studyPlanService.generateSimulado(subject);
-        this.currentExamQuestions.set(questions);
-        this.currentQuestionIndex.set(0);
-        this.selectedAnswer.set(null);
+
+        // Initialize Session in Service
+        this.studyPlanService.startSession(subject, questions);
       }
     } catch (error: any) {
       if (error?.status === 403 || error?.error?.code === 'OUT_OF_CREDITS') {
@@ -233,6 +246,12 @@ export class HomeComponent implements OnInit {
 
     // Track progress if correct
     const question = this.currentQuestion;
+
+    // Save progress to session
+    if (this.currentExamQuestions().length > 0) {
+      this.studyPlanService.updateSessionProgress(this.currentQuestionIndex(), optionIndex);
+    }
+
     if (question && optionIndex === question.correctAnswerIndex) {
       try {
         await this.questionGoalService.addProgress(1);
@@ -246,7 +265,12 @@ export class HomeComponent implements OnInit {
     const current = this.currentQuestionIndex();
     if (current < this.currentExamQuestions().length - 1) {
       this.currentQuestionIndex.set(current + 1);
-      this.selectedAnswer.set(null);
+      // Restore answer if already answered in session
+      const session = this.studyPlanService.getSession();
+      const nextAnswer = session.answers[current + 1] ?? null;
+      this.selectedAnswer.set(nextAnswer);
+
+      this.studyPlanService.updateSessionProgress(current + 1, nextAnswer);
     }
   }
 
@@ -254,7 +278,12 @@ export class HomeComponent implements OnInit {
     const current = this.currentQuestionIndex();
     if (current > 0) {
       this.currentQuestionIndex.set(current - 1);
-      this.selectedAnswer.set(null);
+      // Restore answer
+      const session = this.studyPlanService.getSession();
+      const prevAnswer = session.answers[current - 1] ?? null;
+      this.selectedAnswer.set(prevAnswer);
+
+      this.studyPlanService.updateSessionProgress(current - 1, prevAnswer);
     }
   }
 

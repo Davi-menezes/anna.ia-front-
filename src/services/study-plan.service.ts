@@ -18,8 +18,46 @@ export class StudyPlanService {
   // Track active simulation session to avoid double charging
   private activeSimulationSession = {
     subject: null as string | null,
-    isActive: false
+    isActive: false,
+    questions: [] as Simulado[],
+    currentIndex: 0,
+    answers: {} as { [key: number]: number } // questionIndex -> answerIndex
   };
+
+  hasActiveSession(subject: string): boolean {
+    return this.activeSimulationSession.isActive && this.activeSimulationSession.subject === subject;
+  }
+
+  getSession() {
+    return this.activeSimulationSession;
+  }
+
+  startSession(subject: string, questions: Simulado[]) {
+    this.activeSimulationSession = {
+      subject,
+      isActive: true,
+      questions,
+      currentIndex: 0,
+      answers: {}
+    };
+  }
+
+  updateSessionProgress(index: number, answerIndex: number | null) {
+    this.activeSimulationSession.currentIndex = index;
+    if (answerIndex !== null) {
+      this.activeSimulationSession.answers[index] = answerIndex;
+    }
+  }
+
+  clearSession() {
+    this.activeSimulationSession = {
+      subject: null,
+      isActive: false,
+      questions: [],
+      currentIndex: 0,
+      answers: {}
+    };
+  }
 
   async getActivePlan(): Promise<{ success: boolean; data: any }> {
     const token = this.authService.getToken();
@@ -50,6 +88,11 @@ export class StudyPlanService {
   }
 
   async generateSimulado(subject: string): Promise<Simulado[]> {
+    // Return cached questions if session is active for this subject
+    if (this.hasActiveSession(subject)) {
+      return this.activeSimulationSession.questions;
+    }
+
     const token = this.authService.getToken();
     if (!token) {
       throw new Error('Não autenticado');
