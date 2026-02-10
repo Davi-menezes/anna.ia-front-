@@ -48,18 +48,34 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       @for (simulado of simulados(); track simulado.id) {
       <button type="button" appTilt (click)="openExam(simulado.subject)"
+        [class.border-green-500]="studyPlanService.hasActiveSession(simulado.subject)"
+        [class.bg-green-50]="studyPlanService.hasActiveSession(simulado.subject)"
+        [class.dark:bg-green-900/20]="studyPlanService.hasActiveSession(simulado.subject)"
+        [class.ring-2]="studyPlanService.hasActiveSession(simulado.subject)"
+        [class.ring-green-500]="studyPlanService.hasActiveSession(simulado.subject)"
         class="w-full text-left bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-xl p-4 shadow-md border border-white/40 dark:border-slate-700/50 hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-futuristic-primary/60 min-h-[140px] flex flex-col justify-between">
         <div>
           <h3 class="font-medium text-lg text-futuristic-text dark:text-dark-text mb-1">{{ simulado.subject }}</h3>
           <p class="text-futuristic-subtext dark:text-dark-subtext text-xs mb-3">Simulado de 30 questões.</p>
         </div>
-        <div
-          class="flex items-center gap-1.5 text-[10px] font-bold text-futuristic-primary/80 uppercase tracking-wider">
+        <div class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider"
+          [class.text-green-600]="studyPlanService.hasActiveSession(simulado.subject)"
+          [class.text-futuristic-primary/80]="!studyPlanService.hasActiveSession(simulado.subject)">
+          @if (studyPlanService.hasActiveSession(simulado.subject)) {
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Em andamento
+          } @else {
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           1 crédito por simulado (1º grátis)
+          }
         </div>
       </button>
       }

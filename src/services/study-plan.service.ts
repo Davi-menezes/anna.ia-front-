@@ -24,6 +24,25 @@ export class StudyPlanService {
     answers: {} as { [key: number]: number } // questionIndex -> answerIndex
   };
 
+  constructor() {
+    this.loadSession();
+  }
+
+  private saveSession() {
+    localStorage.setItem('anna_simulation_session', JSON.stringify(this.activeSimulationSession));
+  }
+
+  private loadSession() {
+    const saved = localStorage.getItem('anna_simulation_session');
+    if (saved) {
+      try {
+        this.activeSimulationSession = JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to load session', e);
+      }
+    }
+  }
+
   hasActiveSession(subject: string): boolean {
     return this.activeSimulationSession.isActive && this.activeSimulationSession.subject === subject;
   }
@@ -40,6 +59,7 @@ export class StudyPlanService {
       currentIndex: 0,
       answers: {}
     };
+    this.saveSession();
   }
 
   updateSessionProgress(index: number, answerIndex: number | null) {
@@ -47,6 +67,7 @@ export class StudyPlanService {
     if (answerIndex !== null) {
       this.activeSimulationSession.answers[index] = answerIndex;
     }
+    this.saveSession();
   }
 
   clearSession() {
@@ -57,6 +78,7 @@ export class StudyPlanService {
       currentIndex: 0,
       answers: {}
     };
+    localStorage.removeItem('anna_simulation_session');
   }
 
   async getActivePlan(): Promise<{ success: boolean; data: any }> {

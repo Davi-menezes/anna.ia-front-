@@ -159,7 +159,12 @@ export class HomeComponent implements OnInit {
       return;
     }
     this.simuladoToStart.set(subject);
-    this.showSimuladoConfirm.set(true);
+
+    if (this.studyPlanService.hasActiveSession(subject)) {
+      this.confirmStartSimulado();
+    } else {
+      this.showSimuladoConfirm.set(true);
+    }
   }
 
   cancelSimulado() {
