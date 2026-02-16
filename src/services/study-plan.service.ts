@@ -159,7 +159,7 @@ export class StudyPlanService {
     );
 
     if (response.success) {
-      this.activeSimulationSession.isActive = true; // Mark session as active
+      // DO NOT set isActive here — session only becomes active after questions are loaded via startSession()
       this.userService.credits.set(response.credits);
       if (response.freeTrialUsed) {
         const currentUser = this.userService.user();
