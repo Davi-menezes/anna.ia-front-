@@ -327,6 +327,12 @@
         Próxima
       </button>
     </div>
+    } @else {
+    <div class="text-center py-10">
+      <p class="text-futuristic-subtext dark:text-dark-subtext">Nenhuma questão disponível para este simulado.</p>
+      <button (click)="closeExam()"
+        class="mt-4 px-4 py-2 text-sm bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors">Fechar</button>
+    </div>
     }
   </div>
 </div>
