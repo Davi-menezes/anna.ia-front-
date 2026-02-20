@@ -202,6 +202,8 @@ export class HomeComponent implements OnInit {
       } else {
         // New Session
         let questions: Simulado[] = [];
+        console.log(`confirmStartSimulado: Checking for subject "${subject}" in allQuestions:`, !!this.allQuestions[subject]);
+        
         if (this.allQuestions[subject]) {
           console.log(`Using local questions for ${subject}`);
           const localQuestions = [...this.allQuestions[subject]];
@@ -210,8 +212,11 @@ export class HomeComponent implements OnInit {
             ...q,
             id: index
           })) as Simulado[];
+          console.log(`Loaded ${questions.length} local questions for ${subject}`);
         } else {
+          console.log(`No local questions for ${subject}, calling API...`);
           questions = await this.studyPlanService.generateSimulado(subject);
+          console.log(`API returned ${questions.length} questions for ${subject}`);
         }
 
         this.currentExamQuestions.set(questions);

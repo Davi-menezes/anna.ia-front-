@@ -126,10 +126,12 @@ export class StudyPlanService {
       const response = await lastValueFrom(
         this.http.get<{ success: boolean, data: Simulado[], credits?: number }>(`${this.apiUrl}/simulado/${subject}`, { headers })
       );
+      console.log('generateSimulado response:', response);
       if (response.success) {
         if (typeof response.credits === 'number') {
           this.userService.credits.set(response.credits);
         }
+        console.log('Questions received:', response.data?.length);
         return response.data;
       } else {
         throw new Error('Falha ao gerar simulado.');
