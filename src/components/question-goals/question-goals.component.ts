@@ -50,7 +50,8 @@ export class QuestionGoalsComponent {
   progressText = computed(() => {
     const g = this.goal();
     if (!g) return '0/0';
-    return `${g.targetQuestions}/${g.completedQuestions}`;
+    // Show completed/target format (e.g., "5/10" means 5 completed out of 10 target)
+    return `${g.completedQuestions}/${g.targetQuestions}`;
   });
 
   constructor() {
