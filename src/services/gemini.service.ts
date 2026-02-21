@@ -17,8 +17,8 @@ export class GeminiService {
   error = signal<string | null>(null);
 
   // Configuração de retry
-  private readonly MAX_RETRIES = 3;
-  private readonly INITIAL_DELAY = 1000; // 1 segundo
+  private readonly MAX_RETRIES = 5;
+  private readonly INITIAL_DELAY = 1500; // 1.5 segundos
 
   constructor() { }
 
@@ -27,7 +27,7 @@ export class GeminiService {
   }
 
   private async generateResponseWithRetry(
-    prompt: string, 
+    prompt: string,
     history: { role: string, content: string }[],
     attempt: number = 0
   ): Promise<string> {
@@ -50,19 +50,19 @@ export class GeminiService {
     } catch (e: any) {
       // Verificar se é erro 429 e ainda temos tentativas
       const isRateLimit = e.status === 429 || e.code === 'RATE_LIMIT_EXCEEDED' || e.error?.code === 'RATE_LIMIT_EXCEEDED';
-      
+
       if (isRateLimit && attempt < this.MAX_RETRIES) {
         const delay = this.INITIAL_DELAY * Math.pow(2, attempt); // Backoff exponencial
         console.log(`Rate limit excedido. Tentando novamente em ${delay}ms (tentativa ${attempt + 1}/${this.MAX_RETRIES})`);
-        
+
         // Verificar se há header Retry-After
         const retryAfter = e.error?.retryAfter || e.headers?.get('Retry-After');
         const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : delay;
-        
+
         await this.sleep(waitTime);
         return this.generateResponseWithRetry(prompt, history, attempt + 1);
       }
-      
+
       // Erro não recuperável ou sem tentativas
       if (e.status === 403) {
         this.error.set('Créditos insuficientes para usar o chat.');
@@ -78,13 +78,13 @@ export class GeminiService {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Erro desconhecido';
-    
+
     if (error.error instanceof ErrorEvent) {
       errorMessage = error.error.message;
     } else {
       errorMessage = error.error?.message || error.message;
     }
-    
+
     console.error('Erro na requisição:', errorMessage, 'Status:', error.status);
     return throwError(() => ({ ...error, message: errorMessage }));
   }
@@ -92,7 +92,7 @@ export class GeminiService {
   async generateResponse(prompt: string, history: { role: string, content: string }[] = []): Promise<string> {
     this.loading.set(true);
     this.error.set(null);
-    
+
     try {
       return await this.generateResponseWithRetry(prompt, history);
     } finally {

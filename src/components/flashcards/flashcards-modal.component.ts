@@ -195,8 +195,8 @@ export class FlashcardsModalComponent {
   }
 
   // Configuração de retry
-  private readonly MAX_RETRIES = 3;
-  private readonly INITIAL_DELAY = 1000; // 1 segundo
+  private readonly MAX_RETRIES = 5;
+  private readonly INITIAL_DELAY = 2000; // 2 segundos
 
   private async sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -250,26 +250,26 @@ export class FlashcardsModalComponent {
       // Check for specific error types
       const status = e.status;
       const errorData = e.error;
-      
+
       // Verificar se é erro 429 (rate limit ou quota) e ainda temos tentativas
-      const isRateLimit = status === 429 || 
-                          errorData?.code === 'GEMINI_QUOTA_EXCEEDED' || 
-                          errorData?.code === 'RATE_LIMIT_EXCEEDED';
-      
+      const isRateLimit = status === 429 ||
+        errorData?.code === 'GEMINI_QUOTA_EXCEEDED' ||
+        errorData?.code === 'RATE_LIMIT_EXCEEDED';
+
       if (isRateLimit && attempt < this.MAX_RETRIES) {
-        const delay = this.INITIAL_DELAY * Math.pow(2, attempt); // Backoff exponencial
+        const delay = this.INITIAL_DELAY * Math.pow(1.5, attempt); // Backoff
         console.log(`Rate limit excedido. Tentando novamente em ${delay}ms (tentativa ${attempt + 1}/${this.MAX_RETRIES})`);
-        
+
         // Verificar se há retryAfter do backend
         const retryAfter = errorData?.retryAfter || Math.ceil(delay / 1000);
-        
-        this.isGenerating.set(false); // Temporariamente desativar loading
-        this.error.set(`Aguarde ${retryAfter} segundos... (tentativa ${attempt + 1}/${this.MAX_RETRIES})`);
-        
+
+        this.isGenerating.set(true); // Manter loading
+        this.error.set(`Alta demanda no serviço de IA. Reajustando e tentando novamente em ${retryAfter}s... (tentativa ${attempt + 1}/${this.MAX_RETRIES})`);
+
         await this.sleep(retryAfter * 1000);
         return this.generateFlashcardsWithRetry(attempt + 1);
       }
-      
+
       // Erro não recuperável ou sem tentativas restantes
       if (isRateLimit) {
         this.error.set('Muitas requisições. Por favor, aguarde alguns segundos e tente novamente.');
