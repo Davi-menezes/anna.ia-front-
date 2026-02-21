@@ -14,7 +14,7 @@ bootstrapApplication(AppComponent, {
     provideZonelessChangeDetection(),
     provideRouter(APP_ROUTES),
     provideHttpClient(withInterceptors([authInterceptor])),
-    importProvidersFrom(MarkdownModule.forRoot({ loader: HttpClient, katex: true })),
+    importProvidersFrom(MarkdownModule.forRoot({ loader: HttpClient })),
   ],
 }).catch(err => console.error(err));
 
