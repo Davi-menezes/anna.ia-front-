@@ -54,6 +54,12 @@ export class QuestionGoalsComponent {
     return `${g.completedQuestions}/${g.targetQuestions}`;
   });
 
+  isGoalReached = computed(() => {
+    const g = this.goal();
+    if (!g || !g.targetQuestions) return false;
+    return g.completedQuestions >= g.targetQuestions;
+  });
+
   constructor() {
     this.refresh();
     this.loadStudyGoals();
@@ -76,7 +82,10 @@ export class QuestionGoalsComponent {
     try {
       const res = await this.questionGoalService.getTodayGoal();
       this.goal.set(res.data);
-      this.targetInput.set(res.data.targetQuestions || 0);
+      // Only update targetInput if it's not currently being edited or if it's the first load
+      if (this.targetInput() === 0 || res.data.targetQuestions !== this.targetInput()) {
+        this.targetInput.set(res.data.targetQuestions || 0);
+      }
     } catch (e: any) {
       this.error.set('Erro ao carregar meta do dia.');
     } finally {
@@ -116,6 +125,13 @@ export class QuestionGoalsComponent {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  async incrementTarget(amount: number) {
+    const currentTarget = this.goal()?.targetQuestions || 0;
+    const newTarget = currentTarget + amount;
+    this.targetInput.set(newTarget);
+    await this.saveTarget();
   }
 
   async addProgress(amount: number) {
