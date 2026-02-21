@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { ChatMessage } from '../../models/chat.model';
 import { Simulado } from '../../models/simulado.model';
@@ -21,7 +22,7 @@ import { QuestionGoalService } from '../../services/question-goal.service';
   standalone: true,
   templateUrl: './home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, CommonModule, CreditsModalComponent, RouterLink, TiltDirective, OnboardingModalComponent]
+  imports: [FormsModule, CommonModule, CreditsModalComponent, RouterLink, TiltDirective, OnboardingModalComponent, MarkdownModule]
 })
 export class HomeComponent implements OnInit {
   geminiService = inject(GeminiService);
@@ -203,7 +204,7 @@ export class HomeComponent implements OnInit {
         // New Session
         let questions: Simulado[] = [];
         console.log(`confirmStartSimulado: Checking for subject "${subject}" in allQuestions:`, !!this.allQuestions[subject]);
-        
+
         if (this.allQuestions[subject]) {
           console.log(`Using local questions for ${subject}`);
           const localQuestions = [...this.allQuestions[subject]];
