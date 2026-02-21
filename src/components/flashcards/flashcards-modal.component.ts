@@ -194,7 +194,19 @@ export class FlashcardsModalComponent {
     window.dispatchEvent(event);
   }
 
+  // Configuração de retry
+  private readonly MAX_RETRIES = 3;
+  private readonly INITIAL_DELAY = 1000; // 1 segundo
+
+  private async sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   async generateFlashcards() {
+    await this.generateFlashcardsWithRetry(0);
+  }
+
+  private async generateFlashcardsWithRetry(attempt: number) {
     this.isGenerating.set(true);
     this.error.set(null);
     this.success.set(null);
@@ -239,8 +251,29 @@ export class FlashcardsModalComponent {
       const status = e.status;
       const errorData = e.error;
       
-      if (status === 429 || errorData?.code === 'GEMINI_QUOTA_EXCEEDED') {
-        // Quota exceeded - show friendly message with retry time
+      // Verificar se é erro 429 (rate limit ou quota) e ainda temos tentativas
+      const isRateLimit = status === 429 || 
+                          errorData?.code === 'GEMINI_QUOTA_EXCEEDED' || 
+                          errorData?.code === 'RATE_LIMIT_EXCEEDED';
+      
+      if (isRateLimit && attempt < this.MAX_RETRIES) {
+        const delay = this.INITIAL_DELAY * Math.pow(2, attempt); // Backoff exponencial
+        console.log(`Rate limit excedido. Tentando novamente em ${delay}ms (tentativa ${attempt + 1}/${this.MAX_RETRIES})`);
+        
+        // Verificar se há retryAfter do backend
+        const retryAfter = errorData?.retryAfter || Math.ceil(delay / 1000);
+        
+        this.isGenerating.set(false); // Temporariamente desativar loading
+        this.error.set(`Aguarde ${retryAfter} segundos... (tentativa ${attempt + 1}/${this.MAX_RETRIES})`);
+        
+        await this.sleep(retryAfter * 1000);
+        return this.generateFlashcardsWithRetry(attempt + 1);
+      }
+      
+      // Erro não recuperável ou sem tentativas restantes
+      if (isRateLimit) {
+        this.error.set('Muitas requisições. Por favor, aguarde alguns segundos e tente novamente.');
+      } else if (status === 429 || errorData?.code === 'GEMINI_QUOTA_EXCEEDED') {
         const retryAfter = errorData?.retryAfter || 60;
         this.error.set(`Serviço de IA temporariamente indisponível. Por favor, tente novamente em ${retryAfter} segundos.`);
       } else if (status === 503 || errorData?.message?.includes('indisponível')) {
