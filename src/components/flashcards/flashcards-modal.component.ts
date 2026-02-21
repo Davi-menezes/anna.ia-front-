@@ -235,7 +235,19 @@ export class FlashcardsModalComponent {
       }
 
     } catch (e: any) {
-      this.error.set(e.error?.message || 'Erro ao gerar flashcards.');
+      // Check for specific error types
+      const status = e.status;
+      const errorData = e.error;
+      
+      if (status === 429 || errorData?.code === 'GEMINI_QUOTA_EXCEEDED') {
+        // Quota exceeded - show friendly message with retry time
+        const retryAfter = errorData?.retryAfter || 60;
+        this.error.set(`Serviço de IA temporariamente indisponível. Por favor, tente novamente em ${retryAfter} segundos.`);
+      } else if (status === 503 || errorData?.message?.includes('indisponível')) {
+        this.error.set('Serviço de IA temporariamente indisponível. Tente novamente mais tarde.');
+      } else {
+        this.error.set(errorData?.message || 'Erro ao gerar flashcards.');
+      }
     } finally {
       this.isGenerating.set(false);
     }

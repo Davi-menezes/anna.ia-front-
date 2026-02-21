@@ -56,6 +56,16 @@ export class QuestionGoalsComponent {
   constructor() {
     this.refresh();
     this.loadStudyGoals();
+    this.setupEventListeners();
+  }
+
+  private setupEventListeners() {
+    // Listen for progress updates from simulado (when user answers correctly)
+    window.addEventListener('questionGoalProgressUpdated', (event: any) => {
+      const { completedQuestions } = event.detail || {};
+      // Refresh to get updated goal
+      this.refresh();
+    });
   }
 
 

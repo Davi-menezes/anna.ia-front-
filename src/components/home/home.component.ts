@@ -265,6 +265,10 @@ export class HomeComponent implements OnInit {
     if (question && optionIndex === question.correctAnswerIndex) {
       try {
         await this.questionGoalService.addProgress(1);
+        // Emit event to notify other components (like question-goals) about the progress update
+        window.dispatchEvent(new CustomEvent('questionGoalProgressUpdated', {
+          detail: { completedQuestions: 1 }
+        }));
       } catch (err) {
         console.error('Error updating question goal progress:', err);
       }
