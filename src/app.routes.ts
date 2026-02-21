@@ -18,73 +18,141 @@ import { QuestionGoalsComponent } from './components/question-goals/question-goa
 import { authGuard } from './guards/auth.guard';
 
 export const APP_ROUTES: Routes = [
-  { path: '', component: HomeComponent, title: 'Anna.IA - Início' },
-  { path: 'login', component: LoginComponent, title: 'Anna.IA - Login' },
-  { path: 'forgot-password', component: ForgotPasswordComponent, title: 'Anna.IA - Recuperar senha' },
-  { path: 'reset-password', component: ResetPasswordComponent, title: 'Anna.IA - Redefinir senha' },
-  { path: 'register', component: RegisterComponent, title: 'Anna.IA - Cadastro' },
-  { path: 'terms', component: TermsComponent, title: 'Anna.IA - Termos de Uso' },
+  {
+    path: '',
+    component: HomeComponent,
+    title: 'Anna.IA - Início',
+    data: {
+      description: 'Prepare-se para o vestibular com o Anna.IA. Planos de estudo personalizados, simulados e flashcards inteligentes.',
+      keywords: 'estudo personalizado, vestibular, enem, simulados, flashcards, ia educação'
+    }
+  },
+  {
+    path: 'login',
+    component: LoginComponent,
+    title: 'Anna.IA - Login',
+    data: {
+      description: 'Acesse sua conta Anna.IA e continue sua jornada rumo à aprovação.',
+      robots: 'noindex, nofollow'
+    }
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent,
+    title: 'Anna.IA - Recuperar senha',
+    data: { robots: 'noindex, nofollow' }
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+    title: 'Anna.IA - Redefinir senha',
+    data: { robots: 'noindex, nofollow' }
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
+    title: 'Anna.IA - Cadastro',
+    data: {
+      description: 'Cadastre-se na Anna.IA e comece seu plano de estudos inteligente hoje mesmo.',
+      keywords: 'cadastro anna ia, novo usuario'
+    }
+  },
+  {
+    path: 'terms',
+    component: TermsComponent,
+    title: 'Anna.IA - Termos de Uso',
+    data: {
+      description: 'Termos de uso e condições do serviço Anna.IA.',
+      robots: 'index, nofollow'
+    }
+  },
   { path: 'cadastro', redirectTo: 'register', pathMatch: 'full' },
   {
     path: 'verification-sent',
     component: VerificationSentComponent,
-    title: 'Verificação de Email Enviado'
+    title: 'Verificação de Email Enviado',
+    data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'verify-email',
     component: VerifyEmailComponent,
-    title: 'Verificação de E-mail'
+    title: 'Verificação de E-mail',
+    data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'auth/callback',
     component: AuthCallbackComponent,
-    title: 'Autenticando...'
+    title: 'Autenticando...',
+    data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'verify-email/:token',
     component: VerifyEmailComponent,
-    title: 'Verificação de E-mail'
+    title: 'Verificação de E-mail',
+    data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'email-verified',
     component: EmailVerifiedComponent,
-    title: 'E-mail Verificado'
+    title: 'E-mail Verificado',
+    data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'profile',
     component: ProfileComponent,
     title: 'Anna.IA - Perfil',
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'credits',
     component: CreditsComponent,
     title: 'Anna.IA - Créditos',
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    data: {
+      description: 'Adquira créditos para usar os recursos avançados de IA da Anna.',
+      keywords: 'comprar creditos, anna ia premium'
+    }
   },
   {
     path: 'vestibulares',
     component: VestibularesComponent,
     title: 'Anna.IA - Vestibulares',
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    data: {
+      description: 'Informações atualizadas sobre os principais vestibulares do Brasil: ENEM, FUVEST, UNICAMP e mais.',
+      keywords: 'calendario vestibular, datas enem, inscricoes vestibular'
+    }
   },
   {
     path: 'study-plan',
     component: StudyPlanComponent,
     title: 'Anna.IA - Meu Plano de Estudos',
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    data: {
+      description: 'Seu cronograma de estudos personalizado gerado por inteligência artificial.',
+      keywords: 'cronograma de estudos, plano personalizado, foco vestibular'
+    }
   },
   {
     path: 'flashcards',
     component: FlashcardsComponent,
     title: 'Anna.IA - Flashcards',
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    data: {
+      description: 'Aumente sua memorização com flashcards inteligentes e revisão espaçada.',
+      keywords: 'estudo memoria, flashcards, revisao espacada'
+    }
   },
   {
     path: 'question-goals',
     component: QuestionGoalsComponent,
     title: 'Anna.IA - Meta de Questões',
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    data: {
+      description: 'Defina e acompanhe suas metas diárias de resolução de questões.',
+      keywords: 'metas de estudo, progresso diario, questoes vestibular'
+    }
   },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Exclude sensitive areas if any (e.g., admin, private dash)
+# Disallow: /admin/
+
+Sitemap: https://annaia.com.br/sitemap.xml

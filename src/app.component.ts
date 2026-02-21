@@ -1,9 +1,9 @@
-
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { ThemeService } from './services/theme.service';
 import { CreditsModalComponent } from './components/credits-modal/credits-modal.component';
+import { SeoService } from './services/seo.service';
 
 @Component({
   selector: 'app-root',
@@ -12,9 +12,11 @@ import { CreditsModalComponent } from './components/credits-modal/credits-modal.
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, HeaderComponent, CreditsModalComponent]
 })
-export class AppComponent {
-  // Inject ThemeService to initialize it and apply the theme.
-  constructor() {
-    inject(ThemeService);
+export class AppComponent implements OnInit {
+  private themeService = inject(ThemeService);
+  private seoService = inject(SeoService);
+
+  ngOnInit() {
+    this.seoService.init();
   }
 }
