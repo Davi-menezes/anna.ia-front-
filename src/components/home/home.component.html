@@ -23,7 +23,7 @@
           [class]="message.role === 'user' 
             ? 'inline-block bg-futuristic-primary text-white px-4 py-2 rounded-lg rounded-tr-none max-w-[85%]' 
             : 'inline-block bg-gray-100 dark:bg-slate-700 dark:text-gray-200 px-4 py-2 rounded-lg rounded-tl-none max-w-[85%]'">
-          <markdown [data]="message.content" [katex]="true"></markdown>
+          <markdown [data]="message.content" [katex]="true" [katexOptions]="katexOptions"></markdown>
         </div>
       </div>
       }

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
-import { MarkdownModule } from 'ngx-markdown';
+import { MarkdownModule, KatexOptions } from 'ngx-markdown';
 
 import { ChatMessage } from '../../models/chat.model';
 import { Simulado } from '../../models/simulado.model';
@@ -51,6 +51,15 @@ export class HomeComponent implements OnInit {
   // Simulado Confirmation State
   showSimuladoConfirm = signal(false);
   simuladoToStart = signal<string | null>(null);
+
+  katexOptions: KatexOptions = {
+    delimiters: [
+      { left: '$$', right: '$$', display: true },
+      { left: '$', right: '$', display: false },
+      { left: '\\(', right: '\\)', display: false },
+      { left: '\\[', right: '\\]', display: true }
+    ]
+  };
 
   vestibulares = signal<Vestibular[]>([
     {

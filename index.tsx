@@ -1,5 +1,8 @@
 import './src/styles.css';
 import '@angular/compiler';
+import 'katex/dist/katex.min.css';
+import 'katex';
+import 'katex/dist/contrib/auto-render.min.js';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors, HttpClient } from '@angular/common/http';
@@ -14,7 +17,7 @@ bootstrapApplication(AppComponent, {
     provideZonelessChangeDetection(),
     provideRouter(APP_ROUTES),
     provideHttpClient(withInterceptors([authInterceptor])),
-    importProvidersFrom(MarkdownModule.forRoot({ loader: HttpClient })),
+    importProvidersFrom(MarkdownModule.forRoot({ loader: HttpClient, katex: true } as any)),
   ],
 }).catch(err => console.error(err));
 
