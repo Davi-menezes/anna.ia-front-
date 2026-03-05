@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, OnInit, HostListener, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
@@ -29,6 +29,9 @@ export class HomeComponent implements OnInit {
   userService = inject(UserService);
   studyPlanService = inject(StudyPlanService);
   questionGoalService = inject(QuestionGoalService);
+  private ngZone = inject(NgZone);
+
+  @ViewChild('chatContainer') private chatContainer!: ElementRef<HTMLDivElement>;
 
   userInput = signal('');
   messages = signal<ChatMessage[]>([]);
@@ -38,6 +41,9 @@ export class HomeComponent implements OnInit {
   pendingImageBase64 = signal<string | null>(null);
   pendingImageMime = signal<string>('image/jpeg');
   pendingImagePreview = signal<string | null>(null);
+
+  // Índice da mensagem cujo conteúdo foi copiado (feedback visual temporário)
+  copiedIndex = signal<number | null>(null);
 
   allQuestions = QUESTIONS_POOL;
   simulados = signal<Simulado[]>([]);
@@ -152,41 +158,92 @@ export class HomeComponent implements OnInit {
     this.simulados.set(randomQuestions);
   }
 
+  // Captura Ctrl+V / Cmd+V em qualquer lugar da página para colar imagens no chat
+  @HostListener('paste', ['$event'])
+  onGlobalPaste(event: ClipboardEvent): void {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          this.processImageFile(file);
+          event.preventDefault();
+        }
+        break;
+      }
+    }
+  }
+
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    this.processImageFile(file);
+    input.value = '';
+  }
 
+  private processImageFile(file: File): void {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
       alert('Formato não suportado. Use JPG, PNG, WEBP ou GIF.');
-      input.value = '';
       return;
     }
-
-    // Limite de 7 MB
     if (file.size > 7 * 1024 * 1024) {
       alert('A imagem é muito grande. O limite é 7 MB.');
-      input.value = '';
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
-      // Separa o prefixo "data:image/jpeg;base64," do dado puro
       const base64 = dataUrl.split(',')[1];
-      this.pendingImageBase64.set(base64);
-      this.pendingImageMime.set(file.type);
-      this.pendingImagePreview.set(dataUrl);
+      // Atualiza signals dentro da zona Angular para disparar change detection (OnPush)
+      this.ngZone.run(() => {
+        this.pendingImageBase64.set(base64);
+        this.pendingImageMime.set(file.type);
+        this.pendingImagePreview.set(dataUrl);
+      });
     };
     reader.readAsDataURL(file);
-    input.value = '';
   }
 
   clearPendingImage(): void {
     this.pendingImageBase64.set(null);
     this.pendingImagePreview.set(null);
+  }
+
+  copyMessage(content: string, index: number): void {
+    // Remove marcação markdown simples para copiar texto limpo
+    const plain = content
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/`{1,3}[^`]*`{1,3}/g, (m) => m.replace(/`/g, ''))
+      .replace(/#{1,6}\s/g, '')
+      .trim();
+
+    navigator.clipboard.writeText(plain).then(() => {
+      this.copiedIndex.set(index);
+      setTimeout(() => this.copiedIndex.set(null), 2000);
+    }).catch(() => {
+      // Fallback para navegadores sem clipboard API
+      const ta = document.createElement('textarea');
+      ta.value = plain;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      this.copiedIndex.set(index);
+      setTimeout(() => this.copiedIndex.set(null), 2000);
+    });
+  }
+
+  private scrollToBottom(): void {
+    setTimeout(() => {
+      if (this.chatContainer?.nativeElement) {
+        this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
+      }
+    }, 60);
   }
 
   private isAskingForJustAnswer(text: string): boolean {
@@ -242,6 +299,7 @@ export class HomeComponent implements OnInit {
     ]);
     this.userInput.set('');
     this.clearPendingImage();
+    this.scrollToBottom();
 
     const response = await this.geminiService.generateResponse(
       prompt || 'Analise esta imagem e me ajude a entender o conteúdo educacional.',
@@ -250,6 +308,7 @@ export class HomeComponent implements OnInit {
       imageMime
     );
     this.messages.update(msgs => [...msgs, { role: 'model', content: response }]);
+    this.scrollToBottom();
   }
 
   async openExam(subject: string) {

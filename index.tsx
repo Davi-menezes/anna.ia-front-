@@ -8,6 +8,9 @@ import { MarkdownModule } from 'ngx-markdown';
 import { AppComponent } from './src/app.component';
 import { APP_ROUTES } from './src/app.routes';
 import { authInterceptor } from './src/interceptors/auth.interceptor';
+import { injectSpeedInsights } from '@vercel/speed-insights';
+
+injectSpeedInsights();
 
 bootstrapApplication(AppComponent, {
   providers: [

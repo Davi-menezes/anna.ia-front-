@@ -14,20 +14,54 @@
         Consome 0,5 créditos por mensagem
       </span>
     </div>
-    <div
+    <div #chatContainer
       class="overflow-y-auto no-scrollbar mb-4 p-4 bg-white/50 dark:bg-slate-900/50 rounded-lg transition-all duration-500 ease-in-out"
       [ngClass]="hasStartedChat() ? 'h-[400px] sm:h-[650px]' : 'h-[150px] sm:h-[200px]'">
       @for (message of messages(); track $index) {
-      <div [class]="message.role === 'user' ? 'text-right mb-4' : 'text-left mb-4'">
+      <div [class]="message.role === 'user' ? 'text-right mb-4' : 'text-left mb-6'">
         <div
           [class]="message.role === 'user'
             ? 'inline-block bg-futuristic-primary text-white px-4 py-2 rounded-lg rounded-tr-none max-w-[85%]'
-            : 'inline-block bg-gray-100 dark:bg-slate-700 dark:text-gray-200 px-4 py-2 rounded-lg rounded-tl-none max-w-[85%]'">
+            : 'inline-block bg-gray-100 dark:bg-slate-700 dark:text-gray-200 px-4 py-3 rounded-lg rounded-tl-none max-w-[85%] relative'">
           @if (message.imageUrl) {
             <img [src]="message.imageUrl" alt="Imagem enviada"
               class="max-w-[220px] max-h-[180px] rounded-lg mb-2 object-contain border border-white/30">
           }
           <markdown [data]="message.content" [katex]="true" [katexOptions]="katexOptions"></markdown>
+
+          <!-- Botão de copiar (apenas para respostas do modelo) -->
+          @if (message.role === 'model') {
+          <div class="mt-2 pt-2 border-t border-gray-200/60 dark:border-slate-600/60 flex justify-end">
+            <button (click)="copyMessage(message.content, $index)"
+              [title]="copiedIndex() === $index ? 'Copiado!' : 'Copiar resposta'"
+              class="flex items-center gap-1 text-[11px] text-gray-400 dark:text-slate-500 hover:text-futuristic-primary dark:hover:text-futuristic-primary transition-colors px-2 py-0.5 rounded-md hover:bg-gray-200/50 dark:hover:bg-slate-600/40">
+              @if (copiedIndex() === $index) {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-green-500">Copiado!</span>
+              } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              <span>Copiar</span>
+              }
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- Indicador de carregamento: 3 bolinhas pulsando -->
+      @if (geminiService.loading()) {
+      <div class="text-left mb-4">
+        <div class="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-slate-700 text-gray-400 dark:text-slate-400 px-5 py-3.5 rounded-lg rounded-tl-none shadow-sm">
+          <div class="typing-dots flex items-center gap-1.5">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
       </div>
       }
