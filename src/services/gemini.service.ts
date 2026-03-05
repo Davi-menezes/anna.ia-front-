@@ -4,6 +4,7 @@ import { environment } from '../environments/environment';
 import { firstValueFrom, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { UserService } from './user.service';
+import { ChatMessage } from '../models/chat.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,11 +17,30 @@ export class GeminiService {
   loading = signal(false);
   error = signal<string | null>(null);
 
+  // Histórico do chat persistido durante toda a sessão (sobrevive a navegações)
+  messages = signal<ChatMessage[]>([]);
+
   // Configuração de retry
   private readonly MAX_RETRIES = 5;
   private readonly INITIAL_DELAY = 1500; // 1.5 segundos
 
   constructor() { }
+
+  // Inicializa a saudação apenas se o chat ainda estiver vazio
+  initGreeting(): void {
+    if (this.messages().length > 0) return;
+    const hour = new Date().getHours();
+    let greeting = 'Olá';
+    if (hour >= 5 && hour < 12) greeting = 'Bom dia';
+    else if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
+    else greeting = 'Boa noite';
+    this.messages.set([{ role: 'model', content: `${greeting}! Como está o processo de estudos?` }]);
+  }
+
+  clearChat(): void {
+    this.messages.set([]);
+    this.initGreeting();
+  }
 
   private async sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));

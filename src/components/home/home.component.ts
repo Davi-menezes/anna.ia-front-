@@ -34,8 +34,9 @@ export class HomeComponent implements OnInit {
   @ViewChild('chatContainer') private chatContainer!: ElementRef<HTMLDivElement>;
 
   userInput = signal('');
-  messages = signal<ChatMessage[]>([]);
-  hasStartedChat = computed(() => this.messages().length > 1);
+  // messages vive no GeminiService para persistir entre navegações
+  get messages() { return this.geminiService.messages; }
+  hasStartedChat = computed(() => this.geminiService.messages().length > 1);
 
   // Imagem pendente para envio junto com a próxima mensagem
   pendingImageBase64 = signal<string | null>(null);
@@ -128,17 +129,7 @@ export class HomeComponent implements OnInit {
   }
 
   setGreeting() {
-    const hour = new Date().getHours();
-    let timeGreeting = 'Olá';
-    if (hour >= 5 && hour < 12) timeGreeting = 'Bom dia';
-    else if (hour >= 12 && hour < 18) timeGreeting = 'Boa tarde';
-    else timeGreeting = 'Boa noite';
-
-    if (this.messages().length === 0) {
-      this.messages.set([
-        { role: 'model', content: `${timeGreeting}! Como está o processo de estudos?` }
-      ]);
-    }
+    this.geminiService.initGreeting();
   }
 
   refreshQuestions() {
