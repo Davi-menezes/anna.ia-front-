@@ -35,7 +35,7 @@ export class CreditsComponent {
   packages: CreditPackage[] = [
     {
       amount: 10,
-      price: 'R$ a',
+      price: 'R$ 7,90',
       description: 'Para começar.',
       paymentLink: 'https://mpago.la/1zuxEKQ'
     },
@@ -50,7 +50,7 @@ export class CreditsComponent {
       amount: 150,
       price: 'R$ 39,90',
       description: 'Para estudantes dedicados.',
-      paymentLink: 'https://mpago.la/1YGYeLu'
+      paymentLink: 'https://mpago.la/1tfqe2y'
     },
     {
       amount: 500,
