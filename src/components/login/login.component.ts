@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isLoading = false;
 
-        // Handle specific error codes or messages
+        // Trata códigos de erro específicos da API
         const errorCode = err.code || err.error?.code;
         const errorMessage = err.error?.message || err.message;
 
@@ -88,7 +88,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Clean up subscriptions
+    // Cancela todas as subscriptions ao destruir o componente
     this.subscriptions.unsubscribe();
   }
 }

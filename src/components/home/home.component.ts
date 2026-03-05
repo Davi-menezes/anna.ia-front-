@@ -34,21 +34,26 @@ export class HomeComponent implements OnInit {
   messages = signal<ChatMessage[]>([]);
   hasStartedChat = computed(() => this.messages().length > 1);
 
+  // Imagem pendente para envio junto com a próxima mensagem
+  pendingImageBase64 = signal<string | null>(null);
+  pendingImageMime = signal<string>('image/jpeg');
+  pendingImagePreview = signal<string | null>(null);
+
   allQuestions = QUESTIONS_POOL;
   simulados = signal<Simulado[]>([]);
 
-  // Exam Modal State
+  // Estado do modal de prova/simulado
   selectedSubject = signal<string | null>(null);
   currentExamQuestions = signal<Simulado[]>([]);
   currentQuestionIndex = signal<number>(0);
   selectedAnswer = signal<number | null>(null);
-  isLoadingSimulado = signal(false); // Loading state for simulado
+  isLoadingSimulado = signal(false); // Estado de carregamento do simulado
   simuladoError = signal<string | null>(null);
 
-  // Onboarding State
+  // Estado do onboarding
   showOnboarding = signal(false);
 
-  // Simulado Confirmation State
+  // Estado do modal de confirmação do simulado
   showSimuladoConfirm = signal(false);
   simuladoToStart = signal<string | null>(null);
 
@@ -91,7 +96,7 @@ export class HomeComponent implements OnInit {
   vestibularesPreview = computed(() => this.vestibulares().slice(0, 3));
 
   constructor(private router: Router) {
-    // Initial greeting moved to ngOnInit to avoid signal issues
+    // Saudação inicial movida para ngOnInit para evitar problemas com signals
   }
 
   ngOnInit() {
@@ -101,7 +106,7 @@ export class HomeComponent implements OnInit {
   }
 
   checkOnboarding() {
-    // Use a small timeout to ensure user data is loaded if it's coming from local storage/auth
+    // Pequeno delay para garantir que os dados do usuário já foram carregados do auth/localStorage
     setTimeout(() => {
       if (this.userService.isLoggedIn()) {
         const u = this.userService.user();
@@ -147,6 +152,60 @@ export class HomeComponent implements OnInit {
     this.simulados.set(randomQuestions);
   }
 
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Formato não suportado. Use JPG, PNG, WEBP ou GIF.');
+      input.value = '';
+      return;
+    }
+
+    // Limite de 7 MB
+    if (file.size > 7 * 1024 * 1024) {
+      alert('A imagem é muito grande. O limite é 7 MB.');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      // Separa o prefixo "data:image/jpeg;base64," do dado puro
+      const base64 = dataUrl.split(',')[1];
+      this.pendingImageBase64.set(base64);
+      this.pendingImageMime.set(file.type);
+      this.pendingImagePreview.set(dataUrl);
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  clearPendingImage(): void {
+    this.pendingImageBase64.set(null);
+    this.pendingImagePreview.set(null);
+  }
+
+  private isAskingForJustAnswer(text: string): boolean {
+    const lower = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const patterns = [
+      /me\s+d[ae]\s+s[oó]\s+a\s+(resposta|solucao|resultado)/,
+      /s[oó]\s+(a\s+)?(resposta|solucao|resultado|gabarito)/,
+      /sem\s+explicac[aã]o/,
+      /nao\s+preciso\s+de\s+explicac[aã]o/,
+      /pode\s+s[oó]\s+dar\s+a\s+resposta/,
+      /s[oó]\s+me\s+(fala|diga|fale|diz)\s+a\s+(resposta|solucao|resultado)/,
+      /qual\s+[eé]\s+a\s+resposta\s+s[oó]/,
+      /me\s+da\s+a\s+solucao\s+logo/,
+      /resposta\s+direta/,
+      /v[aá]\s+direto\s+(ao|para\s+o)\s+ponto/
+    ];
+    return patterns.some(p => p.test(lower));
+  }
+
   async sendMessage() {
     if (!this.userService.isLoggedIn()) {
       this.router.navigate(['/login']);
@@ -154,12 +213,42 @@ export class HomeComponent implements OnInit {
     }
 
     const prompt = this.userInput().trim();
-    if (!prompt) return;
+    const hasImage = !!this.pendingImageBase64();
 
-    this.messages.update(msgs => [...msgs, { role: 'user', content: prompt }]);
+    if (!prompt && !hasImage) return;
+
+    // Bloqueia pedidos de "só a resposta" antes de gastar créditos
+    if (prompt && this.isAskingForJustAnswer(prompt)) {
+      this.messages.update(msgs => [
+        ...msgs,
+        { role: 'user', content: prompt },
+        {
+          role: 'model',
+          content: 'Meu papel é te **ensinar**, não apenas fornecer respostas prontas! Isso não te ajudaria a aprender de verdade.\n\nVamos resolver juntos, passo a passo — assim você vai entender e conseguirá resolver sozinho nas próximas vezes. 💪\n\nMe conta o problema completo que eu te ajudo!'
+        }
+      ]);
+      this.userInput.set('');
+      this.clearPendingImage();
+      return;
+    }
+
+    const imagePreview = this.pendingImagePreview();
+    const imageBase64 = this.pendingImageBase64();
+    const imageMime = this.pendingImageMime();
+
+    this.messages.update(msgs => [
+      ...msgs,
+      { role: 'user', content: prompt || '📷 Imagem enviada', imageUrl: imagePreview ?? undefined }
+    ]);
     this.userInput.set('');
+    this.clearPendingImage();
 
-    const response = await this.geminiService.generateResponse(prompt, this.messages());
+    const response = await this.geminiService.generateResponse(
+      prompt || 'Analise esta imagem e me ajude a entender o conteúdo educacional.',
+      this.messages(),
+      imageBase64 ?? undefined,
+      imageMime
+    );
     this.messages.update(msgs => [...msgs, { role: 'model', content: response }]);
   }
 
@@ -193,24 +282,24 @@ export class HomeComponent implements OnInit {
     this.currentExamQuestions.set([]);
 
     try {
-      // 1. Charge for the simulado
+      // 1. Realiza a cobrança de créditos
       const chargeResult = await this.studyPlanService.chargeSimulado(subject);
       if (!chargeResult.success) {
         throw new Error('Falha na cobrança de créditos.');
       }
 
-      // 2. Load questions
-      // Check if resuming active session
+      // 2. Carrega as questões
+      // Verifica se está retomando uma sessão ativa
       if (this.studyPlanService.hasActiveSession(subject)) {
         const session = this.studyPlanService.getSession();
         this.currentExamQuestions.set(session.questions);
         this.currentQuestionIndex.set(session.currentIndex);
 
-        // Restore current answer if available
+        // Restaura a resposta atual se já respondida na sessão
         const answer = session.answers[session.currentIndex] ?? null;
         this.selectedAnswer.set(answer);
       } else {
-        // New Session
+        // Nova sessão
         let questions: Simulado[] = [];
         console.log(`confirmStartSimulado: Checking for subject "${subject}" in allQuestions:`, !!this.allQuestions[subject]);
 
@@ -233,7 +322,7 @@ export class HomeComponent implements OnInit {
         this.currentQuestionIndex.set(0);
         this.selectedAnswer.set(null);
 
-        // Initialize Session in Service
+        // Inicializa a sessão no serviço
         this.studyPlanService.startSession(subject, questions);
       }
     } catch (error: any) {
@@ -264,10 +353,10 @@ export class HomeComponent implements OnInit {
 
     this.selectedAnswer.set(optionIndex);
 
-    // Track progress if correct
+    // Registra progresso se a resposta estiver correta
     const question = this.currentQuestion;
 
-    // Save progress to session
+    // Salva progresso na sessão ativa
     if (this.currentExamQuestions().length > 0) {
       this.studyPlanService.updateSessionProgress(this.currentQuestionIndex(), optionIndex);
     }
@@ -275,7 +364,7 @@ export class HomeComponent implements OnInit {
     if (question && optionIndex === question.correctAnswerIndex) {
       try {
         await this.questionGoalService.addProgress(1);
-        // Emit event to notify other components (like question-goals) about the progress update
+        // Emite evento para notificar outros componentes (ex.: question-goals) sobre o progresso
         window.dispatchEvent(new CustomEvent('questionGoalProgressUpdated', {
           detail: { completedQuestions: 1 }
         }));
@@ -289,7 +378,7 @@ export class HomeComponent implements OnInit {
     const current = this.currentQuestionIndex();
     if (current < this.currentExamQuestions().length - 1) {
       this.currentQuestionIndex.set(current + 1);
-      // Restore answer if already answered in session
+      // Restaura resposta se já respondida na sessão
       const session = this.studyPlanService.getSession();
       const nextAnswer = session.answers[current + 1] ?? null;
       this.selectedAnswer.set(nextAnswer);
@@ -302,7 +391,7 @@ export class HomeComponent implements OnInit {
     const current = this.currentQuestionIndex();
     if (current > 0) {
       this.currentQuestionIndex.set(current - 1);
-      // Restore answer
+      // Restaura resposta da questão anterior
       const session = this.studyPlanService.getSession();
       const prevAnswer = session.answers[current - 1] ?? null;
       this.selectedAnswer.set(prevAnswer);

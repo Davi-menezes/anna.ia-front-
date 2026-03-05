@@ -118,7 +118,7 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Helper methods for template
+  // Atalhos para acessar os campos do formulário no template
   get name() { return this.registerForm.get('name'); }
   get email() { return this.registerForm.get('email'); }
   get password() { return this.registerForm.get('password'); }

@@ -5,7 +5,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
-    // Add dashboard components here
+    // Componentes do dashboard são registrados aqui
   ],
   imports: [
     CommonModule,

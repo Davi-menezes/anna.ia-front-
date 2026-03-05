@@ -192,7 +192,7 @@ export class ResetPasswordComponent implements OnInit {
     });
   }
 
-  // Password validation helpers for template
+  // Auxiliares de validação de senha para o template
   hasUpperCase(value: string): boolean {
     return /[A-Z]/.test(value || '');
   }

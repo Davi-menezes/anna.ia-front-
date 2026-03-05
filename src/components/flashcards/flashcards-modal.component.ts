@@ -247,7 +247,7 @@ export class FlashcardsModalComponent {
       }
 
     } catch (e: any) {
-      // Check for specific error types
+      // Verifica tipos de erro específicos da resposta
       const status = e.status;
       const errorData = e.error;
 

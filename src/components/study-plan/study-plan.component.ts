@@ -25,7 +25,7 @@ export class StudyPlanComponent {
     step = signal(1);
     isLoading = signal(false);
 
-    // Onboarding Data
+    // Dados do formulário de configuração do plano
     setupData = {
         targetVestibular: '',
         availableTimePerDay: 60,
@@ -95,7 +95,7 @@ export class StudyPlanComponent {
             this.activePlan.set(plan.data);
             await this.generateSchedule();
             if (this.weeklySchedule()) {
-                this.step.set(4); // Show dashboard
+                this.step.set(4); // Exibe o dashboard após gerar o plano
             }
         } catch (error: any) {
             console.error('Error setting up plan:', error);
@@ -146,7 +146,7 @@ export class StudyPlanComponent {
             'sexta': 'sex', 'sábado': 'sab', 'domingo': 'dom'
         };
         const current = this.getCurrentDayName();
-        // The API returns 'segunda', 'terça', etc.
+        // A API retorna 'segunda', 'terça', etc.
         return mapping[dayName.toLowerCase()] === current;
     }
 }

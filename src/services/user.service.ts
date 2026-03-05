@@ -25,7 +25,7 @@ export class UserService {
     private authService: AuthService,
     private http: HttpClient
   ) {
-    // Sync with AuthService
+    // Sincroniza o estado local com o AuthService
     this.authService.currentUser$.subscribe(user => {
       this.isLoggedIn.set(!!user);
       this.user.set(user);
@@ -36,7 +36,7 @@ export class UserService {
     });
   }
 
-  // Deprecated: Authentication is handled by AuthService
+  // Obsoleto: autenticação tratada pelo AuthService
   login() {
     this.router.navigate(['/profile']);
   }
@@ -68,7 +68,7 @@ export class UserService {
     }
   }
 
-  // Legacy local method, now deprecated in favor of deductCredits
+  // Método legado local, substituído por deductCredits
   useCredit(cost: number = 0.25): boolean {
     if (this.credits() >= cost) {
       this.credits.update(c => Math.round(Math.max(0, c - cost) * 100) / 100);
@@ -96,7 +96,7 @@ export class UserService {
       );
       if (response && response.success) {
         this.user.set(response.user);
-        // Sync with global auth state
+        // Sincroniza o estado global de autenticação
         this.authService.fetchCurrentUser().subscribe();
         return response.user;
       }
@@ -119,7 +119,7 @@ export class UserService {
       );
       if (response && response.success) {
         this.user.set(response.user);
-        // Refresh full user state from source of truth to ensure consistency across components
+        // Recarrega o estado completo do usuário para garantir consistência entre componentes
         this.authService.fetchCurrentUser().subscribe();
         return response.user;
       }
@@ -139,7 +139,7 @@ export class UserService {
     if (!user) return 'https://ui-avatars.com/api/?name=User&background=random';
 
     if (user.profilePicture) {
-      // Use the serving endpoint which is now public
+      // Endpoint de foto de perfil é público para permitir carregamento por tags <img>
       return `${this.apiUrl}/users/profile/picture/${user.id}?v=${new Date(user.updatedAt).getTime()}`;
     }
 

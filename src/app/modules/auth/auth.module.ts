@@ -6,7 +6,7 @@ import { LoginComponent } from './components/login/login.component';
 
 @NgModule({
   declarations: [
-    // Add auth-related components here
+    // Componentes de autenticação são registrados aqui
   ],
   imports: [
     CommonModule,

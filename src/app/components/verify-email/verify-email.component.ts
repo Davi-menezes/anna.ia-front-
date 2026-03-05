@@ -144,7 +144,7 @@ export class VerifyEmailComponent implements OnInit {
           this.authService['currentUserSubject'].next(currentUser);
         }
 
-        // Redirect to email verified page after a short delay
+        // Redireciona para a página de e-mail verificado após breve delay
         setTimeout(() => {
           this.router.navigate(['/email-verified'], {
             queryParams: {

@@ -111,14 +111,14 @@ export class VerificationComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Check for email parameter for resend functionality
+    // Verifica parâmetro de e-mail para funcionalidade de reenvio
     this.route.queryParams.subscribe(params => {
       if (params['email']) {
         this.email = params['email'];
       }
     });
 
-    // Check for token parameter for email verification
+    // Verifica parâmetro de token para verificar o e-mail
     this.route.params.subscribe(params => {
       if (params['token']) {
         this.token = params['token'];
@@ -138,7 +138,7 @@ export class VerificationComponent implements OnInit {
         this.verificationSuccess = true;
         this.isVerifying = false;
         
-        // Redirect to login after a short delay
+        // Redireciona para login após breve delay
         setTimeout(() => {
           this.router.navigate(['/login'], { queryParams: { verified: 'true' } });
         }, 2000);

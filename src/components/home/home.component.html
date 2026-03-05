@@ -20,17 +20,52 @@
       @for (message of messages(); track $index) {
       <div [class]="message.role === 'user' ? 'text-right mb-4' : 'text-left mb-4'">
         <div
-          [class]="message.role === 'user' 
-            ? 'inline-block bg-futuristic-primary text-white px-4 py-2 rounded-lg rounded-tr-none max-w-[85%]' 
+          [class]="message.role === 'user'
+            ? 'inline-block bg-futuristic-primary text-white px-4 py-2 rounded-lg rounded-tr-none max-w-[85%]'
             : 'inline-block bg-gray-100 dark:bg-slate-700 dark:text-gray-200 px-4 py-2 rounded-lg rounded-tl-none max-w-[85%]'">
+          @if (message.imageUrl) {
+            <img [src]="message.imageUrl" alt="Imagem enviada"
+              class="max-w-[220px] max-h-[180px] rounded-lg mb-2 object-contain border border-white/30">
+          }
           <markdown [data]="message.content" [katex]="true" [katexOptions]="katexOptions"></markdown>
         </div>
       </div>
       }
     </div>
+    <!-- Preview da imagem selecionada -->
+    @if (pendingImagePreview()) {
+    <div class="mb-2 flex items-center gap-2">
+      <div class="relative inline-block">
+        <img [src]="pendingImagePreview()!" alt="Imagem a ser enviada"
+          class="h-16 w-16 rounded-lg object-cover border-2 border-futuristic-primary shadow">
+        <button (click)="clearPendingImage()" aria-label="Remover imagem"
+          class="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs leading-none shadow hover:bg-red-600 transition-colors">
+          ×
+        </button>
+      </div>
+      <span class="text-xs text-futuristic-subtext dark:text-dark-subtext">Imagem pronta para envio</span>
+    </div>
+    }
+
     <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <!-- Input de arquivo oculto -->
+      <input #fileInput type="file" accept="image/jpeg,image/png,image/webp,image/gif"
+        (change)="onImageSelected($event)" class="hidden" aria-label="Selecionar imagem">
+
+      <!-- Botão de câmera -->
+      <button type="button" (click)="fileInput.click()" aria-label="Enviar foto"
+        title="Anexar imagem (exercício, dúvida escrita, etc.)"
+        class="px-3 py-3 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-futuristic-subtext dark:text-dark-subtext flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </button>
+
       <input type="text" [ngModel]="userInput()" (ngModelChange)="userInput.set($event)" (keyup.enter)="sendMessage()"
-        placeholder="Digite sua pergunta..." aria-label="Sua pergunta para Anna"
+        placeholder="Digite sua pergunta ou anexe uma foto..." aria-label="Sua pergunta para Anna"
         class="flex-1 px-3 sm:px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-futuristic-primary focus:border-transparent dark:bg-slate-800 dark:text-white">
       <button (click)="sendMessage()"
         class="px-4 sm:px-6 py-3 bg-futuristic-primary text-white rounded-lg hover:bg-futuristic-secondary transition-colors font-medium whitespace-nowrap">

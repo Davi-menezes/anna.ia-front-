@@ -343,7 +343,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         console.error('RegisterComponent: Erro capturado no registro:', error);
         this.isSubmitting = false;
 
-        // Extract error message and code
+        // Extrai mensagem e código de erro da resposta
         const errorCode = error.code || error.error?.code;
 
         if (errorCode === 'EMAIL_IN_USE') {
@@ -374,10 +374,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   loginWithGoogle() {
     this.error = null;
-    // FIX: Must subscribe to the Observable
+    // Observable precisa de subscribe para ser executado
     this.authService.loginWithGoogle().subscribe({
       next: () => {
-        // Redirection is handled in service or here if needed
+        // Redirecionamento tratado no AuthService
       },
       error: (err) => {
         this.error = err.message || 'Erro ao conectar com Google.';
@@ -385,7 +385,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Date masking helper
+  // Máscara de data no formato DD/MM/AAAA
   onDateInput(event: any) {
     let value = event.target.value.replace(/\D/g, '');
     if (value.length > 8) value = value.slice(0, 8);
@@ -400,7 +400,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.registerForm.get('birthDate')?.setValue(value, { emitEvent: false });
   }
 
-  // Password validation helpers for template
+  // Auxiliares de validação de senha para o template
   hasUpperCase(value: string): boolean {
     return /[A-Z]/.test(value || '');
   }

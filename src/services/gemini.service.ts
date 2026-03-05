@@ -29,13 +29,21 @@ export class GeminiService {
   private async generateResponseWithRetry(
     prompt: string,
     history: { role: string, content: string }[],
-    attempt: number = 0
+    attempt: number = 0,
+    imageBase64?: string,
+    imageMimeType?: string,
   ): Promise<string> {
     try {
+      const body: Record<string, unknown> = { prompt, history };
+      if (imageBase64 && imageMimeType) {
+        body['imageBase64'] = imageBase64;
+        body['imageMimeType'] = imageMimeType;
+      }
+
       const response = await firstValueFrom(
         this.http.post<{ success: boolean, content: string, credits: number }>(
           `${this.apiUrl}/gemini/chat`,
-          { prompt, history }
+          body
         ).pipe(
           catchError(this.handleError)
         )
@@ -51,16 +59,15 @@ export class GeminiService {
       // Verificar se é erro 429 e ainda temos tentativas
       const isRateLimit = e.status === 429 || e.code === 'RATE_LIMIT_EXCEEDED' || e.error?.code === 'RATE_LIMIT_EXCEEDED';
 
-      if (isRateLimit && attempt < this.MAX_RETRIES) {
-        const delay = this.INITIAL_DELAY * Math.pow(2, attempt); // Backoff exponencial
+        if (isRateLimit && attempt < this.MAX_RETRIES) {
+        const delay = this.INITIAL_DELAY * Math.pow(2, attempt);
         console.log(`Rate limit excedido. Tentando novamente em ${delay}ms (tentativa ${attempt + 1}/${this.MAX_RETRIES})`);
 
-        // Verificar se há header Retry-After
         const retryAfter = e.error?.retryAfter || e.headers?.get('Retry-After');
         const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : delay;
 
         await this.sleep(waitTime);
-        return this.generateResponseWithRetry(prompt, history, attempt + 1);
+        return this.generateResponseWithRetry(prompt, history, attempt + 1, imageBase64, imageMimeType);
       }
 
       // Erro não recuperável ou sem tentativas
@@ -89,12 +96,17 @@ export class GeminiService {
     return throwError(() => ({ ...error, message: errorMessage }));
   }
 
-  async generateResponse(prompt: string, history: { role: string, content: string }[] = []): Promise<string> {
+  async generateResponse(
+    prompt: string,
+    history: { role: string, content: string }[] = [],
+    imageBase64?: string,
+    imageMimeType?: string,
+  ): Promise<string> {
     this.loading.set(true);
     this.error.set(null);
 
     try {
-      return await this.generateResponseWithRetry(prompt, history);
+      return await this.generateResponseWithRetry(prompt, history, 0, imageBase64, imageMimeType);
     } finally {
       this.loading.set(false);
     }

@@ -13,7 +13,7 @@ export class QuestionGoalService {
     private authService = inject(AuthService);
     private apiUrl = `${environment.apiUrl}/question-goals`;
 
-    // Shared state
+    // Estado compartilhado da meta do dia
     todayGoal = signal<QuestionGoal | null>(null);
 
     private headers(): HttpHeaders {

@@ -21,11 +21,11 @@ export class ProfileComponent {
   isEditing = signal(false);
   isLoading = signal(false);
 
-  // Cropper state
+  // Estado do modal de recorte de imagem
   isCropperOpen = signal(false);
   selectedFile = signal<File | null>(null);
 
-  // Buffer for editing
+  // Buffer temporário para edição do perfil
   editForm = signal({
     birthDate: '',
     education: '',
@@ -40,7 +40,7 @@ export class ProfileComponent {
     return Math.min((credits / maxCredits) * 100, 100);
   });
 
-  // FIX: Use constructor injection for Router to fix type inference issue.
+  // Injeção via construtor para corrigir inferência de tipo do Router
   constructor(private router: Router) { }
 
   goToCreditsPage() {
@@ -81,25 +81,25 @@ export class ProfileComponent {
     const file: File = event.target.files[0];
     if (!file) return;
 
-    // Validation: Type
+    // Validação: tipo de arquivo
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
       this.notificationService.showError('Formato inválido. Use JPEG, PNG ou GIF.');
       return;
     }
 
-    // Validation: Size (5MB)
+    // Validação: tamanho máximo de 5MB
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       this.notificationService.showError('Arquivo muito grande. O limite é 5MB.');
       return;
     }
 
-    // If valid, open cropper
+    // Arquivo válido — abre o recortador
     this.selectedFile.set(file);
     this.isCropperOpen.set(true);
 
-    // Reset input so it triggers again even if same file is selected
+    // Reseta o input para permitir selecionar o mesmo arquivo novamente
     event.target.value = '';
   }
 

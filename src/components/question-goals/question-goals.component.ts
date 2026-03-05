@@ -50,7 +50,7 @@ export class QuestionGoalsComponent {
   progressText = computed(() => {
     const g = this.goal();
     if (!g) return '0/0';
-    // Show completed/target format (e.g., "5/10" means 5 completed out of 10 target)
+    // Exibe formato concluído/meta (ex.: "5/10" = 5 de 10 questões concluídas)
     return `${g.completedQuestions}/${g.targetQuestions}`;
   });
 
@@ -67,10 +67,10 @@ export class QuestionGoalsComponent {
   }
 
   private setupEventListeners() {
-    // Listen for progress updates from simulado (when user answers correctly)
+    // Escuta atualizações de progresso do simulado (quando o usuário acerta)
     window.addEventListener('questionGoalProgressUpdated', (event: any) => {
       const { completedQuestions } = event.detail || {};
-      // Refresh to get updated goal
+      // Recarrega para obter a meta atualizada
       this.refresh();
     });
   }
@@ -82,7 +82,7 @@ export class QuestionGoalsComponent {
     try {
       const res = await this.questionGoalService.getTodayGoal();
       this.goal.set(res.data);
-      // Only update targetInput if it's not currently being edited or if it's the first load
+      // Atualiza apenas se não está sendo editado ou se for a primeira carga
       if (this.targetInput() === 0 || res.data.targetQuestions !== this.targetInput()) {
         this.targetInput.set(res.data.targetQuestions || 0);
       }

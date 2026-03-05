@@ -21,48 +21,48 @@ export const APP_ROUTES: Routes = [
   {
     path: '',
     component: HomeComponent,
-    title: 'Anna.IA - Início',
+    title: 'Anna.IA - Assistente de Estudos com IA para Vestibular e ENEM',
     data: {
-      description: 'Prepare-se para o vestibular com o Anna.IA. Planos de estudo personalizados, simulados e flashcards inteligentes.',
-      keywords: 'estudo personalizado, vestibular, enem, simulados, flashcards, ia educação'
+      description: 'Prepare-se para o vestibular e ENEM com o Anna.IA: planos de estudo personalizados, chat com professor virtual, simulados e flashcards inteligentes. Gratuito para começar.',
+      keywords: 'assistente de estudos ia, vestibular, enem, plano de estudos personalizado, simulados, flashcards, professor virtual ia, preparacao vestibular'
     }
   },
   {
     path: 'login',
     component: LoginComponent,
-    title: 'Anna.IA - Login',
+    title: 'Entrar - Anna.IA',
     data: {
-      description: 'Acesse sua conta Anna.IA e continue sua jornada rumo à aprovação.',
+      description: 'Acesse sua conta Anna.IA e continue sua jornada rumo à aprovação no vestibular.',
       robots: 'noindex, nofollow'
     }
   },
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent,
-    title: 'Anna.IA - Recuperar senha',
+    title: 'Recuperar Senha - Anna.IA',
     data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
-    title: 'Anna.IA - Redefinir senha',
+    title: 'Redefinir Senha - Anna.IA',
     data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'register',
     component: RegisterComponent,
-    title: 'Anna.IA - Cadastro',
+    title: 'Criar Conta Grátis - Anna.IA',
     data: {
-      description: 'Cadastre-se na Anna.IA e comece seu plano de estudos inteligente hoje mesmo.',
-      keywords: 'cadastro anna ia, novo usuario'
+      description: 'Crie sua conta gratuita na Anna.IA e comece hoje seu plano de estudos personalizado para o vestibular e ENEM com inteligência artificial.',
+      keywords: 'criar conta anna ia, cadastro gratis, estudos vestibular ia, comecar estudar enem'
     }
   },
   {
     path: 'terms',
     component: TermsComponent,
-    title: 'Anna.IA - Termos de Uso',
+    title: 'Termos de Uso - Anna.IA',
     data: {
-      description: 'Termos de uso e condições do serviço Anna.IA.',
+      description: 'Leia os termos de uso e a política de privacidade da Anna.IA.',
       robots: 'index, nofollow'
     }
   },
@@ -70,88 +70,88 @@ export const APP_ROUTES: Routes = [
   {
     path: 'verification-sent',
     component: VerificationSentComponent,
-    title: 'Verificação de Email Enviado',
+    title: 'Verifique seu E-mail - Anna.IA',
     data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'verify-email',
     component: VerifyEmailComponent,
-    title: 'Verificação de E-mail',
+    title: 'Verificando E-mail - Anna.IA',
     data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'auth/callback',
     component: AuthCallbackComponent,
-    title: 'Autenticando...',
+    title: 'Autenticando - Anna.IA',
     data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'verify-email/:token',
     component: VerifyEmailComponent,
-    title: 'Verificação de E-mail',
+    title: 'Verificando E-mail - Anna.IA',
     data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'email-verified',
     component: EmailVerifiedComponent,
-    title: 'E-mail Verificado',
+    title: 'E-mail Verificado - Anna.IA',
     data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'profile',
     component: ProfileComponent,
-    title: 'Anna.IA - Perfil',
+    title: 'Meu Perfil - Anna.IA',
     canActivate: [authGuard],
     data: { robots: 'noindex, nofollow' }
   },
   {
     path: 'credits',
     component: CreditsComponent,
-    title: 'Anna.IA - Créditos',
+    title: 'Comprar Créditos - Anna.IA',
     canActivate: [authGuard],
     data: {
-      description: 'Adquira créditos para usar os recursos avançados de IA da Anna.',
-      keywords: 'comprar creditos, anna ia premium'
+      description: 'Adquira créditos para usar todos os recursos avançados de IA da Anna: chat, simulados e plano de estudos sem limites.',
+      keywords: 'comprar creditos anna ia, plano premium estudos, ia educacao preco'
     }
   },
   {
     path: 'vestibulares',
     component: VestibularesComponent,
-    title: 'Anna.IA - Vestibulares',
+    title: 'Guia de Vestibulares 2026 - Anna.IA',
     canActivate: [authGuard],
     data: {
-      description: 'Informações atualizadas sobre os principais vestibulares do Brasil: ENEM, FUVEST, UNICAMP e mais.',
-      keywords: 'calendario vestibular, datas enem, inscricoes vestibular'
+      description: 'Calendário e informações completas dos principais vestibulares do Brasil em 2026: ENEM, FUVEST, UNICAMP, UNESP, UFRJ e mais. Datas de inscrição e provas.',
+      keywords: 'calendario vestibular 2026, datas enem 2026, inscricao fuvest, unicamp vestibular, vestibulares brasil'
     }
   },
   {
     path: 'study-plan',
     component: StudyPlanComponent,
-    title: 'Anna.IA - Meu Plano de Estudos',
+    title: 'Meu Plano de Estudos - Anna.IA',
     canActivate: [authGuard],
     data: {
-      description: 'Seu cronograma de estudos personalizado gerado por inteligência artificial.',
-      keywords: 'cronograma de estudos, plano personalizado, foco vestibular'
+      description: 'Seu cronograma de estudos personalizado gerado por inteligência artificial com base no seu vestibular-alvo, pontos fracos e disponibilidade de horários.',
+      keywords: 'cronograma de estudos personalizado, plano de estudos vestibular ia, organizacao estudos enem'
     }
   },
   {
     path: 'flashcards',
     component: FlashcardsComponent,
-    title: 'Anna.IA - Flashcards',
+    title: 'Flashcards Inteligentes - Anna.IA',
     canActivate: [authGuard],
     data: {
-      description: 'Aumente sua memorização com flashcards inteligentes e revisão espaçada.',
-      keywords: 'estudo memoria, flashcards, revisao espacada'
+      description: 'Crie e revise flashcards com inteligência artificial. Sistema de repetição espaçada para memorização eficiente das matérias do vestibular e ENEM.',
+      keywords: 'flashcards vestibular, revisao espacada, memorizacao materias, flashcards ia, estudo ativo'
     }
   },
   {
     path: 'question-goals',
     component: QuestionGoalsComponent,
-    title: 'Anna.IA - Meta de Questões',
+    title: 'Meta de Questões Diárias - Anna.IA',
     canActivate: [authGuard],
     data: {
-      description: 'Defina e acompanhe suas metas diárias de resolução de questões.',
-      keywords: 'metas de estudo, progresso diario, questoes vestibular'
+      description: 'Defina e acompanhe sua meta diária de questões resolvidas. Mantenha a consistência nos estudos com o rastreador de progresso da Anna.IA.',
+      keywords: 'meta de questoes diarias, progresso estudos, consistencia vestibular, rastreador de estudo'
     }
   },
   { path: '**', redirectTo: '', pathMatch: 'full' }

@@ -15,13 +15,13 @@ export class StudyPlanService {
   private userService = inject(UserService);
   private apiUrl = `${environment.apiUrl}/study-plans`;
 
-  // Track active simulation session to avoid double charging
+  // Controla a sessão de simulado ativa para evitar cobrança dupla
   private activeSimulationSession = {
     subject: null as string | null,
     isActive: false,
     questions: [] as Simulado[],
     currentIndex: 0,
-    answers: {} as { [key: number]: number } // questionIndex -> answerIndex
+    answers: {} as { [key: number]: number } // índice da questão -> índice da resposta
   };
 
   constructor() {
@@ -110,7 +110,7 @@ export class StudyPlanService {
   }
 
   async generateSimulado(subject: string): Promise<Simulado[]> {
-    // Return cached questions if session is active for this subject
+    // Retorna questões em cache se já houver sessão ativa para essa matéria
     if (this.hasActiveSession(subject)) {
       return this.activeSimulationSession.questions;
     }
@@ -143,13 +143,12 @@ export class StudyPlanService {
   }
 
   async chargeSimulado(subject?: string): Promise<{ success: boolean; credits: number; freeTrialUsed?: boolean }> {
-    // If there is an active session for this subject (or general if subject not provided but usually flow is per subject),
-    // we skip the charge. ideally we should track subject.
+    // Se já existe sessão ativa para essa matéria, pula a cobrança
     if (this.activeSimulationSession.isActive && this.activeSimulationSession.subject === subject) {
       return { success: true, credits: this.userService.credits() };
     }
 
-    // Set the subject for the new session attempt
+    // Define a matéria para a nova tentativa de sessão
     if (subject) this.activeSimulationSession.subject = subject;
 
     const token = this.authService.getToken();
@@ -161,7 +160,7 @@ export class StudyPlanService {
     );
 
     if (response.success) {
-      // DO NOT set isActive here — session only becomes active after questions are loaded via startSession()
+      // NÃO ativa a sessão aqui — só fica ativa após carregar as questões via startSession()
       this.userService.credits.set(response.credits);
       if (response.freeTrialUsed) {
         const currentUser = this.userService.user();

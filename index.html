@@ -3,55 +3,170 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>Anna.IA - Seu Assistente de Estudos Inteligente</title>
+  <title>Anna.IA - Seu Assistente de Estudos Inteligente para Vestibular e ENEM</title>
   <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-    content="Anna.IA é o seu assistente de estudos pessoal que cria planos personalizados, resolve dúvidas e ajuda você a conquistar seus objetivos acadêmicos com inteligência artificial." />
+    content="Anna.IA é o seu assistente de estudos pessoal com IA. Planos de estudo personalizados, simulados, flashcards e chat com professor virtual para conquistar a aprovação no vestibular e ENEM." />
   <meta name="keywords"
-    content="estudos, vestibular, enem, inteligência artificial, plano de estudos, flashcards, educação" />
+    content="estudos, vestibular, enem, inteligência artificial, plano de estudos, flashcards, educação, professor virtual, simulados, preparação vestibular" />
   <meta name="author" content="Anna.IA" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://annaia.com.br/" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Anna.IA" />
+  <meta property="og:locale" content="pt_BR" />
   <meta property="og:url" content="https://annaia.com.br/" />
   <meta property="og:title" content="Anna.IA - Seu Assistente de Estudos Inteligente" />
   <meta property="og:description"
-    content="Domine seus estudos com o poder da IA. Planos personalizados e ajuda instantânea." />
+    content="Domine seus estudos com o poder da IA. Planos personalizados, simulados e professor virtual para o vestibular e ENEM." />
   <meta property="og:image" content="https://annaia.com.br/assets/images/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Anna.IA - Assistente de Estudos com IA" />
 
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="https://annaia.com.br/" />
-  <meta property="twitter:title" content="Anna.IA - Seu Assistente de Estudos Inteligente" />
-  <meta property="twitter:description"
-    content="Domine seus estudos com o poder da IA. Planos personalizados e ajuda instantânea." />
-  <meta property="twitter:image" content="https://annaia.com.br/assets/images/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@annaia_estudos" />
+  <meta name="twitter:url" content="https://annaia.com.br/" />
+  <meta name="twitter:title" content="Anna.IA - Seu Assistente de Estudos Inteligente" />
+  <meta name="twitter:description"
+    content="Domine seus estudos com o poder da IA. Planos personalizados, simulados e professor virtual para o vestibular e ENEM." />
+  <meta name="twitter:image" content="https://annaia.com.br/assets/images/og-image.png" />
 
-  <!-- Theme Color for PWA/Mobile -->
+  <!-- PWA / Mobile -->
   <meta name="theme-color" content="#4f46e5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Anna.IA" />
+  <meta name="application-name" content="Anna.IA" />
+  <meta name="msapplication-TileColor" content="#4f46e5" />
+  <meta name="format-detection" content="telephone=no" />
 
-  <!-- Structured Data -->
+  <!-- Structured Data: WebSite + SiteLinksSearch -->
   <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Anna.IA",
-      "operatingSystem": "Web",
-      "applicationCategory": "EducationApplication",
-      "description": "Assistente de estudos inteligente com planos personalizados e IA.",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "BRL"
-      }
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Anna.IA",
+    "url": "https://annaia.com.br/",
+    "description": "Assistente de estudos inteligente com planos personalizados, simulados e flashcards para vestibular e ENEM.",
+    "inLanguage": "pt-BR",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://annaia.com.br/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
     }
+  }
   </script>
 
-  <link rel="icon" type="image/png" href="/src/assets/images/logo.png" />
-  <link rel="apple-touch-icon" href="/src/assets/images/logo.png" />
+  <!-- Structured Data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Anna.IA",
+    "operatingSystem": "Web",
+    "applicationCategory": "EducationApplication",
+    "description": "Assistente de estudos com inteligência artificial para vestibular e ENEM: planos personalizados, simulados, flashcards e chat com professor virtual.",
+    "url": "https://annaia.com.br/",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Plano Gratuito",
+        "price": "0",
+        "priceCurrency": "BRL",
+        "description": "Acesso básico com créditos gratuitos para testar a plataforma."
+      },
+      {
+        "@type": "Offer",
+        "name": "Créditos Premium",
+        "price": "9.90",
+        "priceCurrency": "BRL",
+        "description": "Pacote de créditos para uso ilimitado dos recursos de IA."
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "150"
+    },
+    "featureList": [
+      "Plano de estudos personalizado com IA",
+      "Chat com professor virtual",
+      "Simulados de vestibular",
+      "Flashcards inteligentes com revisão espaçada",
+      "Análise de imagens de exercícios",
+      "Metas de questões diárias"
+    ]
+  }
+  </script>
+
+  <!-- Structured Data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Anna.IA",
+    "url": "https://annaia.com.br/",
+    "logo": "https://annaia.com.br/assets/images/logo.png",
+    "sameAs": [],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "availableLanguage": "Portuguese"
+    }
+  }
+  </script>
+
+  <!-- Structured Data: FAQ (home page) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "O que é a Anna.IA?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A Anna.IA é um assistente de estudos com inteligência artificial que cria planos de estudo personalizados, oferece chat com professor virtual, simulados de vestibular, flashcards inteligentes e análise de exercícios por foto."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "A Anna.IA é gratuita?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sim! A Anna.IA oferece um plano gratuito com créditos iniciais para que você possa experimentar todos os recursos. Créditos adicionais podem ser adquiridos para uso contínuo."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "A Anna.IA ajuda na preparação para o ENEM?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sim. A Anna.IA foi criada especialmente para ajudar estudantes que se preparam para vestibulares e o ENEM, com planos de estudo personalizados, simulados e explicações detalhadas de todas as matérias."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Preconnect para recursos externos -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://esm.sh" />
+  <link rel="dns-prefetch" href="https://generativelanguage.googleapis.com" />
+
+  <link rel="icon" type="image/png" href="/assets/images/logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/logo.png" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>

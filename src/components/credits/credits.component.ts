@@ -65,7 +65,7 @@ export class CreditsComponent {
     return user ? user.id : null;
   }
 
-  // FIX: Use constructor injection for Router to fix type inference issue.
+  // Injeção via construtor para corrigir inferência de tipo do Router
   constructor(private router: Router) { }
 
   getPackagePriceString(amount: number): string {
@@ -85,7 +85,7 @@ export class CreditsComponent {
       return;
     }
 
-    // Append external_reference to the payment link
+    // Adiciona o external_reference (userId) ao link de pagamento
     const separator = pkg.paymentLink.includes('?') ? '&' : '?';
     const finalLink = `${pkg.paymentLink}${separator}external_reference=${userId}`;
 
@@ -95,7 +95,7 @@ export class CreditsComponent {
   getPackagePrice(amount: number): number {
     const pkg = this.packages.find(p => p.amount === amount);
     if (!pkg) return 0;
-    // Extract number from "R$ 7,90"
+    // Extrai o número do formato "R$ 7,90"
     return parseFloat(pkg.price.replace('R$ ', '').replace(',', '.'));
   }
 }

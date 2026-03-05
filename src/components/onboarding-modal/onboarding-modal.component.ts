@@ -96,7 +96,7 @@ export class OnboardingModalComponent {
 
   limitYear(event: Event) {
     const input = event.target as HTMLInputElement;
-    // keep only digits and limit to 4 chars
+    // Mantém apenas dígitos e limita a 4 caracteres
     input.value = (input.value || '').replace(/[^0-9]/g, '').slice(0, 4);
     this.year = input.value ? Number(input.value) : null;
   }

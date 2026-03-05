@@ -27,7 +27,7 @@ export class HeaderCreditsModalComponent {
   creditPercentage = computed(() => {
     const credits = this.userService.credits();
     const maxCredits = this.userService.maxCredits;
-    // Avoid division by zero and handle cases where credits might exceed maxCredits
+    // Evita divisão por zero e limita ao máximo de 100%
     if (maxCredits === 0) return 0;
     return Math.min((credits / maxCredits) * 100, 100);
   });
