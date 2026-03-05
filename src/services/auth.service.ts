@@ -239,6 +239,10 @@ export class AuthService {
 
   private handleError(error: HttpErrorResponse) {
     const message = error.error?.message || 'Ocorreu um erro inesperado. Tente novamente.';
-    return throwError(() => new Error(message));
+    const enriched: any = new Error(message);
+    // Preserva status e corpo para que os componentes possam exibir mensagens específicas
+    enriched.status = error.status;
+    enriched.error = error.error;
+    return throwError(() => enriched);
   }
 }
