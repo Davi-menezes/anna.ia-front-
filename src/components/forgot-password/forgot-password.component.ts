@@ -98,7 +98,20 @@ export class ForgotPasswordComponent {
       },
       error: (err) => {
         this.isLoading = false;
-        this.error = err.message || 'Erro ao processar solicitação.';
+        // err.error contém o corpo JSON do servidor; err.message é o texto HTTP genérico
+        const serverMessage: string = err.error?.message || '';
+        const status: number = err.status ?? 0;
+
+        if (status === 404) {
+          this.error = 'Nenhuma conta encontrada com este e-mail. Verifique o endereço ou crie uma conta nova.';
+        } else if (status === 503 || err.error?.code === 'EMAIL_SERVICE_RESTRICTED') {
+          this.error = serverMessage || 'O serviço de e-mail está temporariamente indisponível. Tente fazer login com o Google ou entre em contato com o suporte.';
+        } else if (status === 429) {
+          this.error = 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.';
+        } else {
+          this.error = serverMessage || 'Não foi possível enviar o e-mail de recuperação. Verifique sua conexão e tente novamente.';
+        }
+
         this.cdr.markForCheck();
       }
     });
