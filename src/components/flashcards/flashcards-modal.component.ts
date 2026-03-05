@@ -18,39 +18,44 @@ interface FlashcardRequest {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-slate-800 rounded-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-futuristic-text dark:text-dark-text">
-              Gerar Flashcards Personalizados com IA
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[85vh] overflow-y-auto">
+        <div class="p-4 sm:p-6">
+          <!-- Barra de arrasto visual no mobile -->
+          <div class="flex justify-center mb-3 sm:hidden">
+            <div class="w-10 h-1 rounded-full bg-gray-300 dark:bg-slate-600"></div>
+          </div>
+
+          <div class="flex items-start justify-between mb-5 gap-3">
+            <h2 class="text-base sm:text-xl font-bold text-futuristic-text dark:text-dark-text leading-snug">
+              Gerar Flashcards com IA
             </h2>
-            <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+            <button (click)="closeModal()" class="shrink-0 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          <div class="space-y-4">
+          <div class="space-y-3">
             @for (i of flashcardIndices; track i) {
-              <div class="p-4 border border-gray-200 dark:border-slate-700 rounded-lg">
+              <div class="p-3 sm:p-4 border border-gray-200 dark:border-slate-700 rounded-lg">
                 <div class="flex items-center gap-2 mb-2">
                   <span class="text-sm font-semibold text-futuristic-primary">Flashcard {{ i + 1 }}</span>
-                  <span class="text-xs text-gray-500">(opcional - deixe vazio para aleatório)</span>
+                  <span class="text-xs text-gray-400 hidden sm:inline">(opcional)</span>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   <div>
                     <label class="text-xs text-gray-600 dark:text-gray-400">Matéria</label>
                     <input 
                       [ngModel]="getFlashcardSubject(i)" 
                       (ngModelChange)="setFlashcardSubject(i, $event)" 
-                      placeholder="Ex: Matemática (ou deixe vazio)"
+                      placeholder="Ex: Matemática"
                       class="w-full mt-1 px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm"
                     />
                   </div>
                   <div>
-                    <label class="text-xs text-gray-600 dark:text-gray-400">Tópico específico (opcional)</label>
+                    <label class="text-xs text-gray-600 dark:text-gray-400">Tópico (opcional)</label>
                     <input 
                       [ngModel]="getFlashcardFront(i)" 
                       (ngModelChange)="setFlashcardFront(i, $event)" 
@@ -63,22 +68,22 @@ interface FlashcardRequest {
             }
           </div>
 
-          <div class="mt-6 flex items-center justify-between">
-            <div class="text-sm text-gray-600 dark:text-gray-400">
-              <p>Custo: 0.5 crédito para 10 flashcards</p>
-              <p>Créditos restantes: {{ creditsRemaining() }}</p>
+          <!-- Rodapé: empilhado no mobile, lado a lado no desktop -->
+          <div class="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              <p>Custo: 0,5 crédito • Créditos: <strong>{{ creditsRemaining() }}</strong></p>
             </div>
-            <div class="flex gap-3">
+            <div class="flex gap-2">
               <button 
                 (click)="closeModal()" 
-                class="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-700 text-sm"
+                class="flex-1 sm:flex-none px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-700 text-sm"
               >
                 Cancelar
               </button>
               <button 
                 (click)="generateFlashcards()" 
                 [disabled]="isGenerating()"
-                class="px-4 py-2 rounded-lg bg-green-600 text-white text-sm hover:bg-green-700 disabled:opacity-50 min-w-[200px]"
+                class="flex-1 sm:flex-none px-4 py-2.5 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:opacity-50"
               >
                 @if (isGenerating()) { 
                   <span class="flex items-center gap-2 justify-center">
