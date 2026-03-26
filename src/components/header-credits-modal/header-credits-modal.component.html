@@ -25,7 +25,7 @@
       <div class="flex justify-between items-center text-sm">
         <span class="font-medium text-futuristic-text dark:text-dark-text">Saldo Atual</span>
         <span class="font-bold text-futuristic-primary">
-          @if (userService.isPremium()) { {{ userService.credits() | number:'1.0-2' }} / {{ userService.maxCredits | number:'1.0-2' }} créditos }
+          @if (userService.isPremium()) { {{ userService.credits() | number:'1.0-2' }} créditos }
           @else { {{ userService.credits() | number:'1.0-2' }} / {{ userService.maxCredits | number:'1.0-2' }} créditos }
         </span>
       </div>
